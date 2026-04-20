@@ -1,4 +1,4 @@
 package br.com.oficina.infrastructure.persistence.insumo;
 
-public class VeiculoRepositoryJpa {
+public class InsumoRepositoryJpa {
 }
