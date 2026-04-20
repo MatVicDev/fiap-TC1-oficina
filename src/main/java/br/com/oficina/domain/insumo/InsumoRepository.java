@@ -7,7 +7,7 @@ public interface InsumoRepository {
 
     Insumo salvar(Insumo insumo);
 
-    Optional<Insumo> buscarPorId(Integer id);
+    Optional<Insumo> buscarPorId(Long id);
 
     List<Insumo> listarTodos();
 
