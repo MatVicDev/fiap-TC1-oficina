@@ -1,4 +1,10 @@
 package br.com.oficina.domain.ordemServico;
 
-public class Orcamento {
+import java.math.BigDecimal;
+
+public record Orcamento(BigDecimal valorTotalPecas, BigDecimal valorTotalServicos) {
+
+    public BigDecimal getValorTotalGeral() {
+        return valorTotalPecas.add(valorTotalServicos);
+    }
 }
