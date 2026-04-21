@@ -13,22 +13,24 @@ import java.util.UUID;
 
 public class OrdemServico {
     private UUID id;
-    private Long clienteId;
-    private Long veiculoId;
+    private UUID clienteId;
+    private UUID veiculoId;
 
     @Enumerated(EnumType.STRING)
     private StatusOS status;
 
+    private String sintomaRelatado;
     private List<ItemOS> itens = new ArrayList<>();
     private BigDecimal valorTotal = BigDecimal.ZERO;
     private LocalDateTime dataInicio;
     private LocalDateTime dataEntrega;
 
-    public OrdemServico(Long clienteId, Long veiculoId) {
+    public OrdemServico(UUID clienteId, UUID veiculoId, String sintomaRelatado) {
         this.id = UUID.randomUUID();
         this.clienteId = clienteId;
         this.veiculoId = veiculoId;
         this.status = StatusOS.RECEBIDA;
+        this.sintomaRelatado = sintomaRelatado;
         this.dataInicio = LocalDateTime.now();
     }
 
