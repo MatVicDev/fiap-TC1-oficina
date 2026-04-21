@@ -14,4 +14,8 @@ public class Cpf {
     private boolean isValid(String cpf) {
         return cpf != null && cpf.replaceAll("\\D", "").length()  == 11;
     }
+
+    public String getNumero() {
+        return numero;
+    }
 }
