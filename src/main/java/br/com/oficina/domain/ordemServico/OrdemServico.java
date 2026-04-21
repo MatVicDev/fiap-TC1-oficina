@@ -15,6 +15,7 @@ public class OrdemServico {
     private UUID id;
     private UUID clienteId;
     private UUID veiculoId;
+    private UUID mecanicoId;
 
     @Enumerated(EnumType.STRING)
     private StatusOS status;
@@ -34,9 +35,15 @@ public class OrdemServico {
         this.dataInicio = LocalDateTime.now();
     }
 
-    public void iniciarDiagnostico() {
+    public void iniciarDiagnostico(UUID mecanicoId) {
         validarTransicao(StatusOS.RECEBIDA);
         this.status = StatusOS.EM_DIAGNOSTICO;
+        this.mecanicoId = mecanicoId;
+    }
+
+    public void finalizarDiagnostico() {
+        validarTransicao(StatusOS.FINALIZADA);
+        this.status = StatusOS.AGUARDANDO_APROVACAO;
     }
 
     public void gerarOrcamentoParaAprovacao() {
@@ -52,6 +59,11 @@ public class OrdemServico {
     public void aprovarOrcamento() {
         validarTransicao(StatusOS.AGUARDANDO_APROVACAO);
         this.status = StatusOS.EM_EXECUCAO;
+    }
+
+    public void rejeitarOrcamento() {
+        validarTransicao(StatusOS.AGUARDANDO_APROVACAO);
+        this.status = StatusOS.FINALIZADA;
     }
 
     public void finalizarServico() {

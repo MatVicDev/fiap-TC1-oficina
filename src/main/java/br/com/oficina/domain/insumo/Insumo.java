@@ -3,9 +3,10 @@ package br.com.oficina.domain.insumo;
 import br.com.oficina.exception.DomainException;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class Insumo {
-    private Long id;
+    private UUID id;
     private String descricao;
     private BigDecimal precoBase;
     private TipoInsumo tipo;
@@ -40,7 +41,7 @@ public class Insumo {
         }
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

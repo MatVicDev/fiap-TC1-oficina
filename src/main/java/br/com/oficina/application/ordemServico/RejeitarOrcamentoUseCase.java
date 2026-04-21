@@ -11,11 +11,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class AprovarOrcamentoUseCase {
+public class RejeitarOrcamentoUseCase {
     private final OrdemServicoRepository osRepository;
     private final InsumoRepository insumoRepository;
 
-    public AprovarOrcamentoUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository) {
+    public RejeitarOrcamentoUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository) {
         this.osRepository = osRepository;
         this.insumoRepository = insumoRepository;
     }
@@ -34,7 +34,7 @@ public class AprovarOrcamentoUseCase {
             }
         });
 
-        os.aprovarOrcamento();
+        os.rejeitarOrcamento();
 
         osRepository.salvar(os);
     }

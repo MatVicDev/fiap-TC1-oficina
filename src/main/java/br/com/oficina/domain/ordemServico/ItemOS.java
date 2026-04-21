@@ -5,12 +5,12 @@ import java.util.UUID;
 
 public class ItemOS {
     private UUID id;
-    private Long insumoId;
+    private UUID insumoId;
     private String descricao;
     private BigDecimal precoUnitario;
     private Integer quantidade;
 
-    public ItemOS(Long insumoId, String descricao, BigDecimal precoUnitario, Integer quantidade) {
+    public ItemOS(UUID insumoId, String descricao, BigDecimal precoUnitario, Integer quantidade) {
         if (quantidade <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
         this.id = UUID.randomUUID();
         this.insumoId = insumoId;
@@ -21,5 +21,25 @@ public class ItemOS {
 
     public BigDecimal getPrecoTotal() {
         return this.precoUnitario.multiply(BigDecimal.valueOf(quantidade));
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getInsumoId() {
+        return insumoId;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public BigDecimal getPrecoUnitario() {
+        return precoUnitario;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
     }
 }
