@@ -10,17 +10,18 @@ public class Insumo {
     private String descricao;
     private BigDecimal precoBase;
     private TipoInsumo tipo;
-    private Integer saldoEstoque;
+    private Integer quantidadeEstoque;
 
-    public Insumo(String descricao, BigDecimal precoBase, TipoInsumo tipo, Integer saldoInicial) {
+    public Insumo(String descricao, BigDecimal precoBase, TipoInsumo tipo, Integer quantidadeInicial) {
         if (precoBase.compareTo(BigDecimal.ZERO) < 0) {
             throw new DomainException("Preço não pode ser negativo.");
         }
 
+        this.id = UUID.randomUUID();
         this.descricao = descricao;
         this.precoBase = precoBase;
         this.tipo = tipo;
-        this.saldoEstoque = (tipo == TipoInsumo.PECA) ? saldoInicial : 0;
+        this.quantidadeEstoque = (tipo == TipoInsumo.PECA || tipo == TipoInsumo.PRODUTO)  ? quantidadeInicial : 0;
     }
 
     public void deduzirEstoque(Integer quantidade) {
@@ -28,16 +29,16 @@ public class Insumo {
             return;
         }
 
-        if (this.saldoEstoque < quantidade) {
+        if (this.quantidadeEstoque < quantidade) {
             throw new DomainException("Estoque insuficiente para o insumo: " + descricao);
         }
 
-        this.saldoEstoque -= quantidade;
+        this.quantidadeEstoque -= quantidade;
     }
 
     public void reporEstoque(Integer quantidade) {
         if (this.tipo == TipoInsumo.PECA) {
-            this.saldoEstoque += quantidade;
+            this.quantidadeEstoque += quantidade;
         }
     }
 
@@ -57,7 +58,7 @@ public class Insumo {
         return tipo;
     }
 
-    public Integer getSaldoEstoque() {
-        return saldoEstoque;
+    public Integer getQuantidadeEstoque() {
+        return quantidadeEstoque;
     }
 }
