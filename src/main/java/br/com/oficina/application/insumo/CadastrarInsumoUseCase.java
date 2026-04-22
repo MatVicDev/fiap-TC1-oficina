@@ -5,6 +5,8 @@ import br.com.oficina.domain.insumo.Insumo;
 import br.com.oficina.domain.insumo.InsumoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class CadastrarInsumoUseCase {
     private final InsumoRepository insumoRepository;
@@ -13,7 +15,7 @@ public class CadastrarInsumoUseCase {
         this.insumoRepository = insumoRepository;
     }
 
-    public Long salvar(InsumoInput dados) {
+    public UUID salvar(InsumoInput dados) {
         Insumo insumo = new Insumo(
                 dados.descricao(),
                 dados.precoBase(),

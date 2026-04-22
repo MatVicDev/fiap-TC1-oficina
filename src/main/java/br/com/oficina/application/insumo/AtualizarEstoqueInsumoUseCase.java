@@ -5,6 +5,8 @@ import br.com.oficina.domain.insumo.InsumoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 public class AtualizarEstoqueInsumoUseCase {
     private final InsumoRepository insumoRepository;
@@ -14,7 +16,7 @@ public class AtualizarEstoqueInsumoUseCase {
     }
 
     @Transactional
-    public void atualizar(Long id, Integer quantidade) {
+    public void atualizar(UUID id, Integer quantidade) {
         Insumo insumo = insumoRepository.buscarPorId(id)
                 .orElseThrow(() -> new RuntimeException("Insumo não encontrado!"));
 
