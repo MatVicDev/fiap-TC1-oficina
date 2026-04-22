@@ -31,7 +31,7 @@ public class AbrirOrdemServicoUseCase {
     }
 
     @Transactional
-    public UUID abrir(AbrirOSInput input) {
+    public UUID excecutar(AbrirOSInput input) {
         Cliente cliente = clienteRepository.buscarPorCpf(new Cpf(input.cpfCliente()))
                 .orElseThrow(() -> new RuntimeException("Cliente não cadastrado."));
 
