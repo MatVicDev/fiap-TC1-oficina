@@ -110,6 +110,10 @@ public class OrdemServico {
         return Collections.unmodifiableList(itens);
     }
 
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
     public LocalDateTime getDataInicio() {
         return dataInicio;
     }
