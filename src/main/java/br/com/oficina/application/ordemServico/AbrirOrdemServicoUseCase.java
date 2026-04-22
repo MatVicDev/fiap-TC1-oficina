@@ -2,12 +2,13 @@ package br.com.oficina.application.ordemServico;
 
 import br.com.oficina.api.ordemServico.dto.AbrirOSInput;
 import br.com.oficina.domain.cliente.Cliente;
-import br.com.oficina.domain.ordemServico.*;
+import br.com.oficina.domain.cliente.ClienteRepository;
 import br.com.oficina.domain.cliente.Cpf;
+import br.com.oficina.domain.ordemServico.OrdemServico;
+import br.com.oficina.domain.ordemServico.OrdemServicoRepository;
 import br.com.oficina.domain.veiculo.Placa;
 import br.com.oficina.domain.veiculo.Veiculo;
 import br.com.oficina.domain.veiculo.VeiculoRepository;
-import br.com.oficina.domain.cliente.ClienteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
