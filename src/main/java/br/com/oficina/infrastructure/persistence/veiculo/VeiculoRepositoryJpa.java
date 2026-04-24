@@ -1,4 +1,10 @@
 package br.com.oficina.infrastructure.persistence.veiculo;
 
-public class VeiculoRepositoryJpa {
+import br.com.oficina.domain.veiculo.Veiculo;
+import br.com.oficina.domain.veiculo.VeiculoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.UUID;
+
+public interface VeiculoRepositoryJpa extends JpaRepository<Veiculo, UUID>, VeiculoRepository {
 }
