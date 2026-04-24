@@ -1,6 +1,8 @@
 package br.com.oficina.application.ordemServico;
 
 import br.com.oficina.api.ordemServico.dto.AdicionarItemInput;
+import br.com.oficina.domain.estoque.Estoque;
+import br.com.oficina.domain.estoque.EstoqueRepository;
 import br.com.oficina.domain.insumo.Insumo;
 import br.com.oficina.domain.insumo.InsumoRepository;
 import br.com.oficina.domain.ordemServico.ItemOS;
@@ -13,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdicionarItemOSUseCase {
     private final OrdemServicoRepository osRepository;
     private final InsumoRepository insumoRepository;
+    private final EstoqueRepository estoqueRepository;
 
-    public AdicionarItemOSUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository) {
+    public AdicionarItemOSUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository,  EstoqueRepository estoqueRepository) {
         this.osRepository = osRepository;
         this.insumoRepository = insumoRepository;
+        this.estoqueRepository = estoqueRepository;
     }
 
     @Transactional
@@ -27,13 +31,16 @@ public class AdicionarItemOSUseCase {
         Insumo insumo = insumoRepository.buscarPorId(input.insumoId())
                 .orElseThrow(() -> new RuntimeException("Insumo não encontrado."));
 
-        insumo.deduzirEstoque(input.quantidade());
+        Estoque estoque = estoqueRepository.findByInsumoId(insumo.getId())
+                        .orElseThrow(() -> new RuntimeException("Insumo não encontrado."));
+
+        estoque.reduzir(input.quantidade());
 
         ItemOS itemOS = new ItemOS(insumo.getId(), insumo.getDescricao(), insumo.getPrecoBase(), input.quantidade());
 
         os.adicionarItemOs(itemOS);
 
-        insumoRepository.salvar(insumo);
+        estoqueRepository.salvar(estoque);
         osRepository.salvar(os);
     }
 }

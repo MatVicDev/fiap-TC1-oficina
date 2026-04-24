@@ -1,6 +1,8 @@
 package br.com.oficina.application.ordemServico;
 
 import br.com.oficina.api.ordemServico.dto.AdicionarItemInput;
+import br.com.oficina.domain.estoque.Estoque;
+import br.com.oficina.domain.estoque.EstoqueRepository;
 import br.com.oficina.domain.insumo.Insumo;
 import br.com.oficina.domain.insumo.InsumoRepository;
 import br.com.oficina.domain.insumo.TipoInsumo;
@@ -32,6 +34,9 @@ class AdicionarItemOSUseCaseTest {
     @Mock
     private InsumoRepository insumoRepository;
 
+    @Mock
+    private EstoqueRepository estoqueRepository;
+
     @InjectMocks
     private AdicionarItemOSUseCase useCase;
 
@@ -39,13 +44,15 @@ class AdicionarItemOSUseCaseTest {
     private UUID insumoId;
     private OrdemServico ordemServico;
     private Insumo insumo;
+    private Estoque estoque;
 
     @BeforeEach
     void setUp() {
         ordemServicoId = UUID.randomUUID();
         insumoId = UUID.randomUUID();
         ordemServico = new OrdemServico(UUID.randomUUID(), UUID.randomUUID(), "Troca de óleo");
-        insumo = new Insumo("Óleo 5W30", new BigDecimal("50.00"), TipoInsumo.PRODUTO, 10);
+        insumo = new Insumo("Óleo 5W30", "Descrição qualquer", new BigDecimal("50.00"), TipoInsumo.PRODUTO);
+        estoque = new Estoque(insumoId, 10);
     }
 
     @Test
@@ -55,10 +62,11 @@ class AdicionarItemOSUseCaseTest {
 
         when(ordemServicoRepository.buscarPorId(ordemServicoId)).thenReturn(Optional.of(ordemServico));
         when(insumoRepository.buscarPorId(insumoId)).thenReturn(Optional.of(insumo));
+        when(estoqueRepository.findByInsumoId(insumoId)).thenReturn(Optional.empty());
 
         useCase.executar(input);
 
-        assertEquals(8, insumo.getQuantidadeEstoque());
+        assertEquals(8, estoque.getQuantidade());
         assertEquals(1, ordemServico.getItens().size());
         assertEquals(new BigDecimal("100.00"), ordemServico.getValorTotal());
 

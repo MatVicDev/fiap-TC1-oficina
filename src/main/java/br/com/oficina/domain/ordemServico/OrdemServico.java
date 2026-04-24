@@ -15,11 +15,7 @@ public class OrdemServico {
     private UUID id;
     private UUID clienteId;
     private UUID veiculoId;
-    private UUID mecanicoId;
-
-    @Enumerated(EnumType.STRING)
     private StatusOS status;
-
     private String sintomaRelatado;
     private List<ItemOS> itens = new ArrayList<>();
     private BigDecimal valorTotal = BigDecimal.ZERO;
@@ -35,14 +31,13 @@ public class OrdemServico {
         this.dataInicio = LocalDateTime.now();
     }
 
-    public void iniciarDiagnostico(UUID mecanicoId) {
+    public void iniciarDiagnostico() {
         validarTransicao(StatusOS.RECEBIDA);
         this.status = StatusOS.EM_DIAGNOSTICO;
-        this.mecanicoId = mecanicoId;
     }
 
     public void finalizarDiagnostico() {
-        validarTransicao(StatusOS.FINALIZADA);
+        validarTransicao(StatusOS.EM_DIAGNOSTICO);
         this.status = StatusOS.AGUARDANDO_APROVACAO;
     }
 
@@ -78,7 +73,7 @@ public class OrdemServico {
     }
 
     private void validarTransicao(StatusOS status) {
-        if (this.status == status) {
+        if (this.status != status) {
             throw new IllegalStateException(String.format("Transição inválida: Não é possível realizar esta ação pois a OS está em estado %s.", this.status));
         }
     }

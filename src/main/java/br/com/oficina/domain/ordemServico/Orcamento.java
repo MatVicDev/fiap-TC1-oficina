@@ -1,10 +1,35 @@
 package br.com.oficina.domain.ordemServico;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-public record Orcamento(BigDecimal valorTotalPecas, BigDecimal valorTotalServicos) {
+public class Orcamento {
+    private UUID id;
+    private BigDecimal valorTotal;
+    private StatusOrcamento status;
+    private LocalDateTime dataGeracao;
 
-    public BigDecimal getValorTotalGeral() {
-        return valorTotalPecas.add(valorTotalServicos);
+    public Orcamento(BigDecimal valorTotal, StatusOrcamento status) {
+        this.id = UUID.randomUUID();
+        this.valorTotal = valorTotal;
+        this.status = status;
+        this.dataGeracao = LocalDateTime.now();
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
+    public StatusOrcamento getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getDataGeracao() {
+        return dataGeracao;
     }
 }

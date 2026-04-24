@@ -1,5 +1,7 @@
 package br.com.oficina.application.ordemServico;
 
+import br.com.oficina.domain.estoque.Estoque;
+import br.com.oficina.domain.estoque.EstoqueRepository;
 import br.com.oficina.domain.insumo.Insumo;
 import br.com.oficina.domain.insumo.InsumoRepository;
 import br.com.oficina.domain.ordemServico.OrdemServico;
@@ -14,10 +16,12 @@ import java.util.UUID;
 public class RejeitarOrcamentoUseCase {
     private final OrdemServicoRepository osRepository;
     private final InsumoRepository insumoRepository;
+    private final EstoqueRepository estoqueRepository;
 
-    public RejeitarOrcamentoUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository) {
+    public RejeitarOrcamentoUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository, EstoqueRepository estoqueRepository) {
         this.osRepository = osRepository;
         this.insumoRepository = insumoRepository;
+        this.estoqueRepository = estoqueRepository;
     }
 
     @Transactional
@@ -29,8 +33,12 @@ public class RejeitarOrcamentoUseCase {
             Optional<Insumo> insumo = insumoRepository.buscarPorId(item.getInsumoId());
 
             if (insumo.isPresent()) {
-                insumo.get().reporEstoque(item.getQuantidade());
-                insumoRepository.salvar(insumo.get());
+                Optional<Estoque> estoque = estoqueRepository.findByInsumoId(insumo.get().getId());
+
+                if (estoque.isPresent()) {
+                    estoque.get().repor(item.getQuantidade());
+                    estoqueRepository.salvar(estoque.get());
+                }
             }
         });
 

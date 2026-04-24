@@ -5,8 +5,8 @@ import br.com.oficina.domain.insumo.TipoInsumo;
 import java.math.BigDecimal;
 
 public record InsumoInput(
+        String nome,
         String descricao,
         BigDecimal precoBase,
-        TipoInsumo tipo,
-        Integer quantidadeInicial
+        TipoInsumo tipo
 ) {}

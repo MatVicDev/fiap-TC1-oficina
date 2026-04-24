@@ -14,11 +14,11 @@ public class IniciarDiagnosticoUseCase {
     }
 
     @Transactional
-    public void executar(UUID osId, UUID mecanicoId) {
+    public void executar(UUID osId) {
         OrdemServico os = repository.buscarPorId(osId)
                 .orElseThrow(() -> new RuntimeException("Ordem de Serviço não encontrada."));
 
-        os.iniciarDiagnostico(mecanicoId);
+        os.iniciarDiagnostico();
 
         repository.salvar(os);
     }

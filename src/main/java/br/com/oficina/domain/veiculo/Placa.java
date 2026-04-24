@@ -12,7 +12,7 @@ public class Placa {
     }
 
     private boolean isValid(String numero) {
-        return numero != null && !numero.toUpperCase().matches("[A-Z]{3}[0-9][A-Z0-9][0-9]{2}");
+        return numero != null && numero.toUpperCase().matches("[A-Z]{3}[0-9][A-Z0-9][0-9]{2}");
     }
 
     public String getNumero() {

@@ -17,10 +17,10 @@ public class CadastrarInsumoUseCase {
 
     public UUID salvar(InsumoInput dados) {
         Insumo insumo = new Insumo(
+                dados.nome(),
                 dados.descricao(),
                 dados.precoBase(),
-                dados.tipo(),
-                dados.quantidadeInicial());
+                dados.tipo());
 
         Insumo salvo = insumoRepository.salvar(insumo);
 
