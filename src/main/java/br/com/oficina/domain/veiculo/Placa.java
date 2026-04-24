@@ -1,6 +1,11 @@
 package br.com.oficina.domain.veiculo;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class Placa {
+    @Column(name = "placa", nullable = false, length = 8, unique = true)
     private final String numero;
 
     public Placa(String numero) {

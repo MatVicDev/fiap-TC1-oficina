@@ -1,8 +1,7 @@
 package br.com.oficina.domain.ordemServico;
 
 import br.com.oficina.exception.DomainException;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,13 +10,28 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Table(name = "ordens_servicos")
 public class OrdemServico {
+
+    @Id
     private UUID id;
+
     private UUID clienteId;
     private UUID veiculoId;
+
+    @Enumerated(EnumType.STRING)
     private StatusOS status;
+
     private String sintomaRelatado;
+
+    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL)
     private List<ItemOS> itens = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "orcamento_id")
+    private Orcamento orcamento;
+
     private BigDecimal valorTotal = BigDecimal.ZERO;
     private LocalDateTime dataInicio;
     private LocalDateTime dataEntrega;

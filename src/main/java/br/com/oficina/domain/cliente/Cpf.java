@@ -1,6 +1,11 @@
 package br.com.oficina.domain.cliente;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class Cpf {
+    @Column(name = "cpf", nullable = false, length = 11, unique = true)
     private final String numero;
 
     public Cpf(String numero) {

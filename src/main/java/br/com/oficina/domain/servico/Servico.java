@@ -1,18 +1,27 @@
 package br.com.oficina.domain.servico;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "servicos")
 public class Servico {
+
+    @Id
     private UUID id;
+
     private String nome;
     private String descricao;
     private BigDecimal valor;
-    private LocalDateTime tempoPrevisto;
+    private Integer tempoPrevisto;
 
-    public Servico(String nome, String descricao, BigDecimal valor, LocalDateTime tempoPrevisto) {
+    public Servico(String nome, String descricao, BigDecimal valor, Integer tempoPrevisto) {
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.descricao = descricao;
@@ -36,7 +45,7 @@ public class Servico {
         return valor;
     }
 
-    public LocalDateTime getTempoPrevisto() {
+    public Integer getTempoPrevisto() {
         return tempoPrevisto;
     }
 }

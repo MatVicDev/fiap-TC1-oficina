@@ -1,9 +1,16 @@
 package br.com.oficina.domain.estoque;
 
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
+@Entity
+@Table(name = "estoques")
 public class Estoque {
+
+    @Id
     private UUID id;
+
     private UUID insumoId;
     private Integer quantidade;
 

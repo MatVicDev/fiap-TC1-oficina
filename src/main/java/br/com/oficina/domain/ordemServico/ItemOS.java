@@ -1,11 +1,23 @@
 package br.com.oficina.domain.ordemServico;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@Entity
+@Table(name = "itens_ordem_servico")
 public class ItemOS {
+
+    @Id
     private UUID id;
+
     private UUID insumoId;
+
+    @ManyToOne
+    @JoinColumn(name = "ordem_servico_id")
+    private OrdemServico ordemServico;
+
     private String descricao;
     private BigDecimal precoUnitario;
     private Integer quantidade;

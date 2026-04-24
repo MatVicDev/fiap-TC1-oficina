@@ -1,14 +1,30 @@
 package br.com.oficina.domain.cliente;
 
+import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "clientes")
 public class Cliente {
+
+    @Id
     private UUID id;
+
+    @Column(nullable = false)
     private String nome;
+
+    @Embedded
     private Cpf cpf;
+
+    @Column(length = 11)
     private String telefone;
+
+    @Column(length = 50)
     private String email;
+
     private LocalDateTime dataCadastro;
 
     public Cliente(String nome, String cpfRaw, String telefone, String email) {

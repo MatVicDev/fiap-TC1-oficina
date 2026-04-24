@@ -1,15 +1,22 @@
 package br.com.oficina.domain.insumo;
 
 import br.com.oficina.exception.DomainException;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@Entity
+@Table(name = "insumos")
 public class Insumo {
+
+    @Id
     private UUID id;
     private String nome;
     private String descricao;
     private BigDecimal precoBase;
+
+    @Enumerated(EnumType.STRING)
     private TipoInsumo tipo;
 
     public Insumo(String nome, String descricao, BigDecimal precoBase, TipoInsumo tipo) {

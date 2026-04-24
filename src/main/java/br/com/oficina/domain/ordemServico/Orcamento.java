@@ -1,13 +1,26 @@
 package br.com.oficina.domain.ordemServico;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "orcamentos")
 public class Orcamento {
+
+    @Id
     private UUID id;
+
     private BigDecimal valorTotal;
+
+    @OneToOne(mappedBy = "orcamento")
+    private OrdemServico ordemServico;
+
+    @Enumerated(EnumType.STRING)
     private StatusOrcamento status;
+
     private LocalDateTime dataGeracao;
 
     public Orcamento(BigDecimal valorTotal, StatusOrcamento status) {

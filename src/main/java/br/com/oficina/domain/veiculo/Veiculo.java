@@ -1,14 +1,25 @@
 package br.com.oficina.domain.veiculo;
 
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
+@Entity
+@Table(name = "veiculos")
 public class Veiculo {
+
+    @Id
     private UUID id;
+
+    @Embedded
     private Placa placa;
+
     private String marca;
     private String modelo;
     private Integer ano;
     private String cor;
+
+    @Column(nullable = false)
     private String cpfProprietario;
 
     public Veiculo(Placa placa, String marca, String modelo, Integer ano, String cor, String cpfProprietario) {
