@@ -16,7 +16,7 @@ public class VerificarEstoqueUseCase {
     }
 
     public Integer verificar(UUID insumoId) {
-        return estoqueRepository.findByInsumoId(insumoId)
+        return estoqueRepository.buscarPorInsumoId(insumoId)
                 .map(Estoque::getQuantidade)
                 .orElseThrow(() -> new RuntimeException("Insumo não encontrado"));
     }

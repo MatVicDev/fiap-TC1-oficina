@@ -12,5 +12,5 @@ public interface InsumoRepository {
 
     List<Insumo> listarTodos();
 
-    void excluir(Long id);
+    void excluir(UUID id);
 }

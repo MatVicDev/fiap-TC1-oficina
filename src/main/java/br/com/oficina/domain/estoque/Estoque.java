@@ -1,10 +1,12 @@
 package br.com.oficina.domain.estoque;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Entity
+@NoArgsConstructor
 @Table(name = "estoques")
 public class Estoque {
 

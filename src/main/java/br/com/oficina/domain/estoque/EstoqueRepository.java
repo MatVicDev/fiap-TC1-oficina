@@ -12,7 +12,7 @@ public interface EstoqueRepository {
 
     List<Estoque> listarTodos();
 
-    void excluir(Long id);
+    void excluir(UUID id);
 
-    Optional<Estoque> findByInsumoId(UUID insumoId);
+    Optional<Estoque> buscarPorInsumoId(UUID insumoId);
 }

@@ -24,7 +24,7 @@ public class SolicitarInsumoUseCase {
         Insumo insumo = insumoRepository.buscarPorId(insumoId)
                 .orElseThrow(() -> new RuntimeException("Insumo não identificado"));
 
-        Estoque estoque = estoqueRepository.findByInsumoId(insumoId)
+        Estoque estoque = estoqueRepository.buscarPorInsumoId(insumoId)
                 .orElseThrow(() -> new RuntimeException("Peça não identificada"));
 
         estoque.reduzir(quantidade);

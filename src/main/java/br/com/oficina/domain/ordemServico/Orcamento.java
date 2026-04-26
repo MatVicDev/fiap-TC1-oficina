@@ -1,12 +1,14 @@
 package br.com.oficina.domain.ordemServico;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@NoArgsConstructor
 @Table(name = "orcamentos")
 public class Orcamento {
 

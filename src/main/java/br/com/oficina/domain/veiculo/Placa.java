@@ -2,11 +2,13 @@ package br.com.oficina.domain.veiculo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
 
 @Embeddable
+@NoArgsConstructor
 public class Placa {
     @Column(name = "placa", nullable = false, length = 8, unique = true)
-    private final String numero;
+    private String numero;
 
     public Placa(String numero) {
         if (!isValid(numero)) {

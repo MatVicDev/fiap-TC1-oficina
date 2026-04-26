@@ -2,11 +2,13 @@ package br.com.oficina.domain.cliente;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
 
 @Embeddable
+@NoArgsConstructor
 public class Cpf {
     @Column(name = "cpf", nullable = false, length = 11, unique = true)
-    private final String numero;
+    private String numero;
 
     public Cpf(String numero) {
         if (!isValid(numero)) {

@@ -2,11 +2,13 @@ package br.com.oficina.domain.insumo;
 
 import br.com.oficina.exception.DomainException;
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
+@NoArgsConstructor
 @Table(name = "insumos")
 public class Insumo {
 

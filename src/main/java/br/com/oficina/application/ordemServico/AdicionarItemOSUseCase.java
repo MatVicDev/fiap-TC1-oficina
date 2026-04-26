@@ -31,7 +31,7 @@ public class AdicionarItemOSUseCase {
         Insumo insumo = insumoRepository.buscarPorId(input.insumoId())
                 .orElseThrow(() -> new RuntimeException("Insumo não encontrado."));
 
-        Estoque estoque = estoqueRepository.findByInsumoId(insumo.getId())
+        Estoque estoque = estoqueRepository.buscarPorInsumoId(insumo.getId())
                         .orElseThrow(() -> new RuntimeException("Insumo não encontrado."));
 
         estoque.reduzir(input.quantidade());

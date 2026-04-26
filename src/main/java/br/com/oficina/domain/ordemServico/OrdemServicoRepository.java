@@ -1,7 +1,5 @@
 package br.com.oficina.domain.ordemServico;
 
-import br.com.oficina.domain.cliente.Cpf;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

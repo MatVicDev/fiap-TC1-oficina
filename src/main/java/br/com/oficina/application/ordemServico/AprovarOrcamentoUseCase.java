@@ -33,7 +33,7 @@ public class AprovarOrcamentoUseCase {
             Optional<Insumo> insumo = insumoRepository.buscarPorId(item.getInsumoId());
 
             if (insumo.isPresent()) {
-                Optional<Estoque> estoque = estoqueRepository.findByInsumoId(insumo.get().getId());
+                Optional<Estoque> estoque = estoqueRepository.buscarPorInsumoId(insumo.get().getId());
 
                 if (estoque.isPresent()) {
                     estoque.get().repor(item.getQuantidade());

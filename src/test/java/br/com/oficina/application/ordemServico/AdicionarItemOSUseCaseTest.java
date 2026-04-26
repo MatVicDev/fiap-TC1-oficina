@@ -62,7 +62,7 @@ class AdicionarItemOSUseCaseTest {
 
         when(ordemServicoRepository.buscarPorId(ordemServicoId)).thenReturn(Optional.of(ordemServico));
         when(insumoRepository.buscarPorId(insumoId)).thenReturn(Optional.of(insumo));
-        when(estoqueRepository.findByInsumoId(insumoId)).thenReturn(Optional.empty());
+        when(estoqueRepository.buscarPorInsumoId(insumoId)).thenReturn(Optional.empty());
 
         useCase.executar(input);
 

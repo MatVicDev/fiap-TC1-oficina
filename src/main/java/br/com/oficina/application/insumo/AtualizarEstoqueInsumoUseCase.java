@@ -24,7 +24,7 @@ public class AtualizarEstoqueInsumoUseCase {
         Insumo insumo = insumoRepository.buscarPorId(id)
                 .orElseThrow(() -> new RuntimeException("Insumo não encontrado!"));
 
-        Estoque estoque = estoqueRepository.findByInsumoId(insumo.getId())
+        Estoque estoque = estoqueRepository.buscarPorInsumoId(insumo.getId())
                         .orElseThrow(() -> new RuntimeException("Insumo não enscontrado no estoque!"));
 
         estoque.repor(quantidade);
