@@ -1,5 +1,6 @@
 package br.com.oficina.application.ordemServico;
 
+import br.com.oficina.api.exception.DomainException;
 import br.com.oficina.api.ordemServico.dto.AdicionarItemInput;
 import br.com.oficina.domain.estoque.Estoque;
 import br.com.oficina.domain.estoque.EstoqueRepository;
@@ -8,7 +9,6 @@ import br.com.oficina.domain.insumo.InsumoRepository;
 import br.com.oficina.domain.insumo.TipoInsumo;
 import br.com.oficina.domain.ordemServico.OrdemServico;
 import br.com.oficina.domain.ordemServico.OrdemServicoRepository;
-import br.com.oficina.exception.DomainException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

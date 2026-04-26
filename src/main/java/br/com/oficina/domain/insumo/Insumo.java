@@ -1,6 +1,6 @@
 package br.com.oficina.domain.insumo;
 
-import br.com.oficina.exception.DomainException;
+import br.com.oficina.api.exception.DomainException;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
