@@ -25,7 +25,7 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<ClienteResponse> cadastrar(@Valid @RequestBody CadastrarClienteRequest request) {
-        return ResponseEntity.ok(ClienteMapper.toResponse(cadastrarClienteUseCase.executar(request)));
+        return ResponseEntity.ok(cadastrarClienteUseCase.executar(request));
     }
 
     @GetMapping
