@@ -1,0 +1,26 @@
+package br.com.oficina.application.veiculo;
+
+import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
+import br.com.oficina.api.veiculo.dto.AtualizarVeiculoRequest;
+import br.com.oficina.api.veiculo.dto.VeiculoResponse;
+import br.com.oficina.domain.veiculo.Veiculo;
+import br.com.oficina.domain.veiculo.VeiculoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class AtualizarVeiculoUseCase {
+    private final VeiculoRepository repository;
+
+    public VeiculoResponse executar(UUID id, AtualizarVeiculoRequest request) {
+        Veiculo veiculo = repository.buscarPorid(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Veículo não encontrado"));
+
+        veiculo.atualizar(request.marca(), request.modelo(), request.ano(), request.cor());
+
+        return VeiculoMapper.toResponse(veiculo);
+    }
+}

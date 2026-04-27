@@ -24,10 +24,10 @@ public class Veiculo {
     @Column(nullable = false)
     private String cpfProprietario;
 
-    public Veiculo(Placa placa, String marca, String modelo, Integer ano, String cor, String cpfProprietario) {
+    public Veiculo(String placa, String marca, String modelo, Integer ano, String cor, String cpfProprietario) {
         validarAno(ano);
         this.id = UUID.randomUUID();
-        this.placa = placa;
+        this.placa = new Placa(placa);
         this.marca = marca;
         this.modelo = modelo;
         this.ano = ano;
@@ -39,6 +39,24 @@ public class Veiculo {
         int anoAtual = java.time.Year.now().getValue();
         if (ano < 1900 || ano > anoAtual + 1) {
             throw new IllegalArgumentException("Ano do veículo inválido.");
+        }
+    }
+
+    public void atualizar(String novaMarca, String novaModelo, Integer novaAno, String novaCor) {
+        if (novaMarca != null && !novaMarca.isBlank()) {
+            this.marca = novaMarca;
+        }
+
+        if (novaModelo != null && !novaModelo.isBlank()) {
+            this.modelo = novaModelo;
+        }
+
+        if (novaAno != null)  {
+            this.ano = novaAno;
+        }
+
+        if (novaCor != null && !novaCor.isBlank()) {
+            this.cor = novaCor;
         }
     }
 

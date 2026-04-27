@@ -1,33 +1,28 @@
 package br.com.oficina.application.veiculo;
 
-import br.com.oficina.api.veiculo.dto.VeiculoInput;
-import br.com.oficina.domain.veiculo.*;
+import br.com.oficina.api.veiculo.dto.CadastrarVeiculoRequest;
+import br.com.oficina.api.veiculo.dto.VeiculoResponse;
+import br.com.oficina.domain.veiculo.Veiculo;
+import br.com.oficina.domain.veiculo.VeiculoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CadastrarVeiculoUseCase {
     private final VeiculoRepository repository;
 
-    public CadastrarVeiculoUseCase(VeiculoRepository repository) {
-        this.repository = repository;
-    }
-
-    public void cadastrar(VeiculoInput input) {
-        Placa placa = new Placa(input.placa());
-
-        if (repository.existePorPlaca(placa)) {
-            throw new RuntimeException("Veículo já cadastrado com esta placa.");
-        }
-
+    public VeiculoResponse executar(CadastrarVeiculoRequest request) {
         Veiculo veiculo = new Veiculo(
-                placa,
-                input.marca(),
-                input.modelo(),
-                input.ano(),
-                input.cor(),
-                input.cpfProprietario()
-        );
+                request.placa(),
+                request.marca(),
+                request.modelo(),
+                request.ano(),
+                request.cor(),
+                request.cpfProprietario());
 
         repository.salvar(veiculo);
+
+        return VeiculoMapper.toResponse(veiculo);
     }
 }

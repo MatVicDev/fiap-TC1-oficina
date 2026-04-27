@@ -1,7 +1,10 @@
 package br.com.oficina.domain.veiculo;
 
-import java.util.Optional;
+import br.com.oficina.domain.cliente.Cpf;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface VeiculoRepository {
 
@@ -9,7 +12,13 @@ public interface VeiculoRepository {
 
     Optional<Veiculo> buscarPorPlaca(Placa placa);
 
-    List<Veiculo> listarPorCpfProprietario(String cpf);
+    Optional<Veiculo> buscarPorid(UUID id);
+
+    List<Veiculo> listarVeiculos();
+
+    List<Veiculo> listarPorCpfProprietario(Cpf cpf);
 
     boolean existePorPlaca(Placa placa);
+
+    void excluir(UUID id);
 }

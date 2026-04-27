@@ -1,5 +1,6 @@
 package br.com.oficina.infrastructure.persistence.veiculo;
 
+import br.com.oficina.domain.cliente.Cpf;
 import br.com.oficina.domain.veiculo.Placa;
 import br.com.oficina.domain.veiculo.Veiculo;
 import br.com.oficina.domain.veiculo.VeiculoRepository;
@@ -23,11 +24,21 @@ public interface VeiculoRepositoryJpa extends JpaRepository<Veiculo, UUID>, Veic
         return findByPlaca(placa);
     }
 
+    @Override
+    default Optional<Veiculo> buscarPorid(UUID id) {
+        return findById(id);
+    }
+
     Optional<Veiculo> findByPlaca(Placa placa);
 
     @Override
-    default List<Veiculo> listarPorCpfProprietario(String cpf) {
-        return findByCpfProprietario(cpf);
+    default List<Veiculo> listarVeiculos() {
+        return findAll();
+    }
+
+    @Override
+    default List<Veiculo> listarPorCpfProprietario(Cpf cpf) {
+        return findByCpfProprietario(cpf.getNumero());
     }
 
     List<Veiculo> findByCpfProprietario(String cpf);
@@ -38,4 +49,9 @@ public interface VeiculoRepositoryJpa extends JpaRepository<Veiculo, UUID>, Veic
     }
 
     boolean existsByPlaca(Placa placa);
+
+    @Override
+    default void excluir(UUID id) {
+        deleteById(id);
+    }
 }
