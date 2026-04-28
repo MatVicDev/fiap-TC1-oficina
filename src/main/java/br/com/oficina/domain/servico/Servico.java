@@ -6,8 +6,6 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -30,6 +28,8 @@ public class Servico {
         this.valor = valor;
         this.tempoPrevisto = tempoPrevisto;
     }
+
+    public void atualizar(String nome, String descricao, BigDecimal valor, Integer tempoPrevisto) {}
 
     public UUID getId() {
         return id;
