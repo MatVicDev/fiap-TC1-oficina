@@ -26,7 +26,7 @@ public interface EstoqueRepositoryJpa extends JpaRepository<Estoque, UUID>, Esto
     }
 
     @Override
-    default void excluir(UUID id) {
+    default void excluirPorInsumoId(UUID id) {
         deleteById(id);
     }
 

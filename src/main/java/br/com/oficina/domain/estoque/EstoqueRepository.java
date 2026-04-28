@@ -12,7 +12,7 @@ public interface EstoqueRepository {
 
     List<Estoque> listarTodos();
 
-    void excluir(UUID id);
+    void excluirPorInsumoId(UUID id);
 
     Optional<Estoque> buscarPorInsumoId(UUID insumoId);
 }

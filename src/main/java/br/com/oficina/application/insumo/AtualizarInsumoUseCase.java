@@ -1,6 +1,7 @@
 package br.com.oficina.application.insumo;
 
-import br.com.oficina.api.insumo.dto.CadastrarInsumoRequest;
+import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
+import br.com.oficina.api.insumo.dto.AtualizarInsumoRequest;
 import br.com.oficina.domain.estoque.Estoque;
 import br.com.oficina.domain.estoque.EstoqueRepository;
 import br.com.oficina.domain.insumo.Insumo;
@@ -9,25 +10,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
-public class CadastrarInsumoUseCase {
-    private final InsumoRepository insumoRepository;
+public class AtualizarInsumoUseCase {
+    private final InsumoRepository repository;
     private final EstoqueRepository estoqueRepository;
 
     @Transactional
-    public InsumoResponse executar(CadastrarInsumoRequest request) {
-        Insumo insumo = new Insumo(
+    public InsumoResponse executar(UUID id, AtualizarInsumoRequest request) {
+        Insumo insumo = repository.buscarPorId(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Insumo não encontrado"));
+
+        Estoque estoque = estoqueRepository.buscarPorInsumoId(id)
+                        .orElseThrow(() -> new EntidadeNaoEncontradaException("Insumo não encontrado no estoque"));
+
+        insumo.atualizar(
                 request.nome(),
                 request.descricao(),
                 request.precoBase(),
                 request.tipo());
 
-        insumoRepository.salvar(insumo);
-
-        Estoque estoque = new Estoque(insumo.getId(), request.quantidadeInicial());
-
-        estoqueRepository.salvar(estoque);
+        repository.salvar(insumo);
 
         return InsumoMapper.toResponse(insumo, estoque);
     }

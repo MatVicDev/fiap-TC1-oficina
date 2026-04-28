@@ -33,6 +33,24 @@ public class Insumo {
         this.tipo = tipo;
     }
 
+    public void atualizar(String nome, String descricao, BigDecimal precoBase, TipoInsumo tipo) {
+        if (nome != null && !nome.isBlank()) {
+            this.nome = nome;
+        }
+
+        if (descricao != null && !descricao.isBlank()) {
+            this.descricao = descricao;
+        }
+
+        if (precoBase != null && precoBase.compareTo(BigDecimal.ZERO) < 0) {
+            this.precoBase = precoBase;
+        }
+
+        if (tipo != null && this.tipo != tipo) {
+            this.tipo = tipo;
+        }
+    }
+
     public UUID getId() {
         return id;
     }
