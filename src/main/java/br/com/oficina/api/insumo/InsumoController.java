@@ -3,7 +3,7 @@ package br.com.oficina.api.insumo;
 import br.com.oficina.api.insumo.dto.AtualizarEstoqueUseCase;
 import br.com.oficina.api.insumo.dto.AtualizarInsumoRequest;
 import br.com.oficina.api.insumo.dto.CadastrarInsumoRequest;
-import br.com.oficina.api.insumo.dto.ListarInsumosUseCase;
+import br.com.oficina.api.insumo.dto.InsumoResponse;
 import br.com.oficina.application.insumo.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
