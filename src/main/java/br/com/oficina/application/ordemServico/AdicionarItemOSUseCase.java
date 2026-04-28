@@ -1,6 +1,7 @@
 package br.com.oficina.application.ordemServico;
 
-import br.com.oficina.api.ordemServico.dto.AdicionarItemInput;
+import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
+import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.domain.estoque.Estoque;
 import br.com.oficina.domain.estoque.EstoqueRepository;
 import br.com.oficina.domain.insumo.Insumo;
@@ -8,39 +9,40 @@ import br.com.oficina.domain.insumo.InsumoRepository;
 import br.com.oficina.domain.ordemServico.ItemOS;
 import br.com.oficina.domain.ordemServico.OrdemServico;
 import br.com.oficina.domain.ordemServico.OrdemServicoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
+@RequiredArgsConstructor
 public class AdicionarItemOSUseCase {
     private final OrdemServicoRepository osRepository;
     private final InsumoRepository insumoRepository;
     private final EstoqueRepository estoqueRepository;
 
-    public AdicionarItemOSUseCase(OrdemServicoRepository osRepository, InsumoRepository insumoRepository,  EstoqueRepository estoqueRepository) {
-        this.osRepository = osRepository;
-        this.insumoRepository = insumoRepository;
-        this.estoqueRepository = estoqueRepository;
-    }
-
     @Transactional
-    public void executar(AdicionarItemInput input) {
-        OrdemServico os = osRepository.buscarPorId(input.osId())
-                .orElseThrow(() -> new RuntimeException("Ordem de Serviço não encontrada."));
+    public OrdemServicoResponse executar(UUID osId, UUID insumoId, Integer quantidade) {
+        OrdemServico os = osRepository.buscarPorId(osId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("OS não encontrada"));
 
-        Insumo insumo = insumoRepository.buscarPorId(input.insumoId())
-                .orElseThrow(() -> new RuntimeException("Insumo não encontrado."));
+        Insumo insumo = insumoRepository.buscarPorId(insumoId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Insumo não encontrado"));
 
-        Estoque estoque = estoqueRepository.buscarPorInsumoId(insumo.getId())
-                        .orElseThrow(() -> new RuntimeException("Insumo não encontrado."));
+        Estoque estoque = estoqueRepository.buscarPorInsumoId(insumoId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Estoque não encontrado"));
 
-        estoque.reduzir(input.quantidade());
-
-        ItemOS itemOS = new ItemOS(insumo.getId(), insumo.getDescricao(), insumo.getPrecoBase(), input.quantidade());
-
-        os.adicionarItemOs(itemOS);
+        estoque.reduzir(quantidade);
 
         estoqueRepository.salvar(estoque);
+
+        ItemOS item = new ItemOS(insumoId, insumo.getNome(), insumo.getPrecoBase(), quantidade);
+
+        os.adicionarItemOs(item);
+
         osRepository.salvar(os);
+
+        return OrdemServicoMapper.toResponse(os);
     }
 }

@@ -113,8 +113,20 @@ public class OrdemServico {
         return id;
     }
 
+    public UUID getClienteId() {
+        return clienteId;
+    }
+
+    public UUID getVeiculoId() {
+        return veiculoId;
+    }
+
     public StatusOS getStatus() {
         return status;
+    }
+
+    public String getSintomaRelatado() {
+        return sintomaRelatado;
     }
 
     public List<ItemOS> getItens() {

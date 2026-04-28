@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class RejeitarOrcamentoUseCase {
+public class RegistrarEntregaUseCase {
     private final OrdemServicoRepository repository;
 
     @Transactional
@@ -20,7 +20,7 @@ public class RejeitarOrcamentoUseCase {
         OrdemServico os = repository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("OS não encontrada"));
 
-        os.rejeitarOrcamento();
+        os.registrarEntrega();
 
         repository.salvar(os);
 
