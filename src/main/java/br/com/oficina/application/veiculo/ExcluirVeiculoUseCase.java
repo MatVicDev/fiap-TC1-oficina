@@ -13,7 +13,7 @@ public class ExcluirVeiculoUseCase {
     private final VeiculoRepository repository;
 
     public void executar(UUID id) {
-        repository.buscarPorid(id)
+        repository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Veículo não encontrado"));
 
         repository.excluir(id);

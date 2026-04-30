@@ -23,7 +23,6 @@ public class OrdemServicoController {
     private final ConcluirDiagnosticoUseCase concluirDiagnosticoUseCase;
     private final AprovarOrcamentoUseCase aprovarOrcamentoUseCase;
     private final RejeitarOrcamentoUseCase rejeitarOrcamentoUseCase;
-    private final IniciarServicoUseCase iniciarServicoUseCase;
     private final ConcluirOrdemServicoUseCase concluirOrdemServicoUseCase;
     private final RegistrarEntregaUseCase registrarEntregaUseCase;
     private final AdicionarItemOSUseCase adicionarItemOSUseCase;
@@ -61,11 +60,6 @@ public class OrdemServicoController {
     @PatchMapping("/{id}/orcamento/rejeitar")
     public ResponseEntity<OrdemServicoResponse> rejeitarOrcamento(@PathVariable UUID id) {
         return ResponseEntity.ok(rejeitarOrcamentoUseCase.executar(id));
-    }
-
-    @PatchMapping("/{id}/servico/iniciar")
-    public ResponseEntity<OrdemServicoResponse> iniciarServico(@PathVariable UUID id) {
-        return ResponseEntity.ok(iniciarServicoUseCase.executar(id));
     }
 
     @PatchMapping("/{id}/servico/concluir")

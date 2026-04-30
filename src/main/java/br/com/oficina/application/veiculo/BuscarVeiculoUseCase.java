@@ -16,7 +16,7 @@ public class BuscarVeiculoUseCase {
     private final VeiculoRepository repository;
 
     public VeiculoResponse executar(UUID id) {
-        Veiculo veiculo = repository.buscarPorid(id)
+        Veiculo veiculo = repository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Veículo não encontrado"));
 
         return VeiculoMapper.toResponse(veiculo);

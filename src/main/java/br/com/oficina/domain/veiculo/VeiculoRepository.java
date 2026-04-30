@@ -12,7 +12,7 @@ public interface VeiculoRepository {
 
     Optional<Veiculo> buscarPorPlaca(Placa placa);
 
-    Optional<Veiculo> buscarPorid(UUID id);
+    Optional<Veiculo> buscarPorId(UUID id);
 
     List<Veiculo> listarVeiculos();
 

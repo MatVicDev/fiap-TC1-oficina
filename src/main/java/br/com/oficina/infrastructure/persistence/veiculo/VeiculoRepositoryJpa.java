@@ -25,7 +25,7 @@ public interface VeiculoRepositoryJpa extends JpaRepository<Veiculo, UUID>, Veic
     }
 
     @Override
-    default Optional<Veiculo> buscarPorid(UUID id) {
+    default Optional<Veiculo> buscarPorId(UUID id) {
         return findById(id);
     }
 

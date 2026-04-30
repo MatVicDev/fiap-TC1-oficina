@@ -42,7 +42,7 @@ public class Insumo {
             this.descricao = descricao;
         }
 
-        if (precoBase != null && precoBase.compareTo(BigDecimal.ZERO) < 0) {
+        if (precoBase != null && precoBase.compareTo(BigDecimal.ZERO) > 0) {
             this.precoBase = precoBase;
         }
 
