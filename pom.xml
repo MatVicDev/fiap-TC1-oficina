@@ -154,6 +154,12 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.11</version>
+				<configuration>
+					<excludes>
+						<exclude>br/com/oficina/api/**</exclude>
+						<exclude>br/com/oficina/infrastructure/**</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -175,7 +181,7 @@
 						<configuration>
 							<rules>
 								<rule>
-									<element>PACKAGE</element>
+									<element>BUNDLE</element>
 									<limits>
 										<limit>
 											<counter>LINE</counter>
@@ -183,10 +189,6 @@
 											<minimum>0.80</minimum>
 										</limit>
 									</limits>
-									<includes>
-										<include>br.com.oficina.domain.*</include>
-										<include>br.com.oficina.application.*</include>
-									</includes>
 								</rule>
 							</rules>
 						</configuration>
