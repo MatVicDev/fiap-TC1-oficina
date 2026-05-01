@@ -30,8 +30,8 @@ class ListarClientesUseCaseTest {
     @DisplayName("Deve listar todos os clientes")
     void deveListarTodosOsClientes() {
         List<Cliente> clientes = List.of(
-                new Cliente("Matheus Victor", "12345678901", "41999999999", "matheus@email.com"),
-                new Cliente("João Silva", "98765432100", "41988888888", "joao@email.com"));
+                new Cliente("Matheus Victor", "12345678909", "41999999999", "matheus@email.com"),
+                new Cliente("João Silva", "11144477735", "41988888888", "joao@email.com"));
 
         when(repository.listarClientes()).thenReturn(clientes);
 

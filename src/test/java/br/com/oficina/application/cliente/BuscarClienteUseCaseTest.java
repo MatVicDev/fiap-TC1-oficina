@@ -34,7 +34,7 @@ class BuscarClienteUseCaseTest {
     void deveBuscarClientePorIdComSucesso() {
         Cliente cliente = new Cliente(
                 "Matheus Victor",
-                "12345678901",
+                "12345678909",
                 "41999999999",
                 "matheus@email.com");
 
@@ -51,16 +51,16 @@ class BuscarClienteUseCaseTest {
     void deveBuscarClientePorCpfComSucesso() {
         Cliente cliente = new Cliente(
                 "Matheus Victor",
-                "12345678901",
+                "12345678909",
                 "41999999999",
                 "matheus@email.com");
 
         when(repository.buscarPorCpf(any())).thenReturn(Optional.of(cliente));
 
-        ClienteResponse result = useCase.executar(new Cpf("12345678901"));
+        ClienteResponse response = useCase.executar(new Cpf("12345678909"));
 
-        assertNotNull(result);
-        assertEquals("Matheus Victor", result.nome());
+        assertNotNull(response);
+        assertEquals("Matheus Victor", response.nome());
     }
 
     @Test

@@ -30,7 +30,7 @@ class CadastrarClienteUseCaseTest {
     void deveCadastrarClienteComSucesso() {
         CadastrarClienteRequest request = new CadastrarClienteRequest(
                 "Matheus Victor",
-                "12345678901",
+                "12345678909",
                 "41999999999",
                 "matheus@email.com");
 

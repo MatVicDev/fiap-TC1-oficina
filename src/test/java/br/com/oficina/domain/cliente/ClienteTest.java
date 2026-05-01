@@ -13,13 +13,13 @@ class ClienteTest {
     void deveCriarClienteComSucesso() {
         Cliente cliente = new Cliente(
                 "Matheus Victor",
-                "12345678901",
+                "12345678909",
                 "41999999999",
                 "matheus@email.com");
 
         assertNotNull(cliente.getId());
         assertEquals("Matheus Victor", cliente.getNome());
-        assertEquals("12345678901", cliente.getCpfFormatado());
+        assertEquals("12345678909", cliente.getCpfFormatado());
         assertNotNull(cliente.getDataCadastro());
     }
 
@@ -49,7 +49,7 @@ class ClienteTest {
     void deveAtualizarContatosComSucesso() {
         Cliente cliente = new Cliente(
                 "Matheus Victor",
-                "12345678901",
+                "12345678909",
                 "41999999999",
                 "matheus@email.com");
 
@@ -64,7 +64,7 @@ class ClienteTest {
     void naoDeveAtualizarContatosComValoresNulos() {
         Cliente cliente = new Cliente(
                 "Matheus Victor",
-                "12345678901",
+                "12345678909",
                 "41999999999",
                 "matheus@email.com");
 

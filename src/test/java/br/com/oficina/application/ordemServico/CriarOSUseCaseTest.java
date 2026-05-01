@@ -43,11 +43,11 @@ class CriarOSUseCaseTest {
     @Test
     @DisplayName("Deve criar uma ordem de serviço com sucesso")
     void deveCriarOSComSucesso() {
-        Cliente cliente = new Cliente("Matheus", "12345678901", "41999999999", "matheus@email.com");
+        Cliente cliente = new Cliente("Matheus", "12345678909", "41999999999", "matheus@email.com");
         Veiculo veiculo = new Veiculo("ABC1D23", "Toyota", "Corolla", 2020, "Prata", "12345678901");
 
         CriarOSRequest request = new CriarOSRequest(
-                "12345678901",
+                "12345678909",
                 "ABC1D23",
                 "Barulho no motor");
 
@@ -71,7 +71,7 @@ class CriarOSUseCaseTest {
     @DisplayName("Deve lançar exceção quando cliente não for encontrado")
     void deveLancarExcecaoQuandoClienteNaoEncontrado() {
         CriarOSRequest request = new CriarOSRequest(
-                "12345678901",
+                "12345678909",
                 "ABC1D23",
                 "Barulho no motor");
 
@@ -85,10 +85,10 @@ class CriarOSUseCaseTest {
     @Test
     @DisplayName("Deve lançar exceção quando veículo não for encontrado")
     void deveLancarExcecaoQuandoVeiculoNaoEncontrado() {
-        Cliente cliente = new Cliente("Matheus Victor", "12345678901", "41999999999", "matheus@email.com");
+        Cliente cliente = new Cliente("Matheus Victor", "12345678909", "41999999999", "matheus@email.com");
 
         CriarOSRequest request = new CriarOSRequest(
-                "12345678901",
+                "12345678909",
                 "ABC1D23",
                 "Barulho no motor");
 
