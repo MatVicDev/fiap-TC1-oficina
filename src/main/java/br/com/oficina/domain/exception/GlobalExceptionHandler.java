@@ -1,7 +1,5 @@
-package br.com.oficina.api.exception;
+package br.com.oficina.domain.exception;
 
-import br.com.oficina.domain.exception.DomainException;
-import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
