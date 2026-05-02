@@ -1,11 +1,11 @@
 package br.com.oficina.application.ordemServico;
 
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.api.ordemServico.dto.CriarOSRequest;
 import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.domain.cliente.Cliente;
 import br.com.oficina.domain.cliente.ClienteRepository;
 import br.com.oficina.domain.cliente.Cpf;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.ordemServico.OrdemServico;
 import br.com.oficina.domain.ordemServico.OrdemServicoRepository;
 import br.com.oficina.domain.ordemServico.StatusOS;

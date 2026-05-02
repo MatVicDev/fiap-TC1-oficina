@@ -1,6 +1,6 @@
 package br.com.oficina.domain.ordemServico;
 
-import br.com.oficina.api.exception.DomainException;
+import br.com.oficina.domain.exception.DomainException;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -54,16 +54,6 @@ public class OrdemServico {
 
     public void finalizarDiagnostico() {
         validarTransicao(StatusOS.EM_DIAGNOSTICO);
-        this.status = StatusOS.AGUARDANDO_APROVACAO;
-    }
-
-    public void gerarOrcamentoParaAprovacao() {
-        validarTransicao(StatusOS.EM_DIAGNOSTICO);
-
-        if (itens.isEmpty()) {
-            throw new IllegalStateException("Não é possível gerar orçamento sem itens/serviços.");
-        }
-
         this.status = StatusOS.AGUARDANDO_APROVACAO;
     }
 

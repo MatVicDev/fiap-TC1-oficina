@@ -1,6 +1,6 @@
 package br.com.oficina.domain.insumo;
 
-import br.com.oficina.api.exception.DomainException;
+import br.com.oficina.domain.exception.DomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

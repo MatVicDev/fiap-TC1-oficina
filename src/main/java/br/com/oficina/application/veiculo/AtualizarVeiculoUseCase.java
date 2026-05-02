@@ -1,8 +1,8 @@
 package br.com.oficina.application.veiculo;
 
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.api.veiculo.dto.AtualizarVeiculoRequest;
 import br.com.oficina.api.veiculo.dto.VeiculoResponse;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.veiculo.Veiculo;
 import br.com.oficina.domain.veiculo.VeiculoRepository;
 import lombok.RequiredArgsConstructor;

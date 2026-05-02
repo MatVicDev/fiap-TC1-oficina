@@ -1,9 +1,9 @@
 package br.com.oficina.application.ordemServico;
 
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.domain.estoque.Estoque;
 import br.com.oficina.domain.estoque.EstoqueRepository;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.insumo.Insumo;
 import br.com.oficina.domain.insumo.InsumoRepository;
 import br.com.oficina.domain.ordemServico.ItemOS;

@@ -1,10 +1,10 @@
 package br.com.oficina.application.cliente;
 
 import br.com.oficina.api.cliente.dto.ClienteResponse;
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.cliente.Cliente;
 import br.com.oficina.domain.cliente.ClienteRepository;
 import br.com.oficina.domain.cliente.Cpf;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

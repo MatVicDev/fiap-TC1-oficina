@@ -1,4 +1,4 @@
-package br.com.oficina.api.exception;
+package br.com.oficina.domain.exception;
 
 public class DomainException extends RuntimeException {
 

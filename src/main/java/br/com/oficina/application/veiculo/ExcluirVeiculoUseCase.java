@@ -1,6 +1,6 @@
 package br.com.oficina.application.veiculo;
 
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.veiculo.VeiculoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

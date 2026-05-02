@@ -1,7 +1,7 @@
 package br.com.oficina.application.cliente;
 
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.cliente.ClienteRepository;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

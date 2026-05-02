@@ -1,6 +1,6 @@
 package br.com.oficina.application.servico;
 
-import br.com.oficina.api.exception.EntidadeNaoEncontradaException;
+import br.com.oficina.domain.exception.EntidadeNaoEncontradaException;
 import br.com.oficina.domain.servico.Servico;
 import br.com.oficina.domain.servico.ServicoRepository;
 import org.junit.jupiter.api.DisplayName;
