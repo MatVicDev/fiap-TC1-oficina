@@ -37,8 +37,7 @@ public class AdicionarItemOSUseCase {
 
         estoqueRepository.salvar(estoque);
 
-        ItemOS item = new ItemOS(insumoId, insumo.getNome(), insumo.getPrecoBase(), quantidade);
-
+        ItemOS item = new ItemOS(insumoId, insumo.getNome(), insumo.getPrecoBase(), quantidade, os);
         os.adicionarItemOs(item);
 
         osRepository.salvar(os);

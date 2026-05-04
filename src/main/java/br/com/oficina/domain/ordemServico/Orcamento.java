@@ -32,6 +32,14 @@ public class Orcamento {
         this.dataGeracao = LocalDateTime.now();
     }
 
+    public void aprovar() {
+        this.status = StatusOrcamento.APROVADO;
+    }
+
+    public void rejeitar() {
+        this.status = StatusOrcamento.REJEITADO;
+    }
+
     public UUID getId() {
         return id;
     }

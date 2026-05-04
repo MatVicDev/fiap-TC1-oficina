@@ -60,11 +60,17 @@ public class OrdemServico {
     public void aprovarOrcamento() {
         validarTransicao(StatusOS.AGUARDANDO_APROVACAO);
         this.status = StatusOS.EM_EXECUCAO;
+        if (this.orcamento != null) {
+            this.orcamento.aprovar();
+        }
     }
 
     public void rejeitarOrcamento() {
         validarTransicao(StatusOS.AGUARDANDO_APROVACAO);
         this.status = StatusOS.FINALIZADA;
+        if (this.orcamento != null) {
+            this.orcamento.rejeitar();
+        }
     }
 
     public void finalizarServico() {
@@ -97,6 +103,10 @@ public class OrdemServico {
         this.valorTotal = itens.stream()
                 .map(ItemOS::getPrecoTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public void setOrcamento(Orcamento orcamento) {
+        this.orcamento = orcamento;
     }
 
     public UUID getId() {

@@ -89,7 +89,8 @@ class OrdemServicoTest {
                 UUID.randomUUID(),
                 "Óleo Motor",
                 new BigDecimal("50.00"),
-                2);
+                2,
+                new OrdemServico());
 
         ordemServico.adicionarItemOs(item);
 
@@ -107,7 +108,8 @@ class OrdemServicoTest {
                 UUID.randomUUID(),
                 "Óleo Motor",
                 new BigDecimal("50.00"),
-                2);
+                2,
+                new OrdemServico());
 
         assertThrows(Exception.class, () -> ordemServico.adicionarItemOs(item));
     }

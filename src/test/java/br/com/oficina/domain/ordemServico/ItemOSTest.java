@@ -17,7 +17,9 @@ class ItemOSTest {
     void deveCalcularPrecoTotalCorretamente() {
         ItemOS item = new ItemOS(
                 UUID.randomUUID(), "Óleo Motor",
-                new BigDecimal("50.00"), 3);
+                new BigDecimal("50.00"),
+                3,
+                new OrdemServico());
 
         assertEquals(new BigDecimal("150.00"), item.getPrecoTotal());
     }
@@ -26,8 +28,11 @@ class ItemOSTest {
     @DisplayName("Deve lançar exceção para quantidade zero")
     void deveLancarExcecaoParaQuantidadeZero() {
         assertThrows(IllegalArgumentException.class, () ->
-                new ItemOS(UUID.randomUUID(), "Óleo Motor",
-                        new BigDecimal("50.00"), 0));
+                new ItemOS(
+                        UUID.randomUUID(), "Óleo Motor",
+                        new BigDecimal("50.00"),
+                        0,
+                        new OrdemServico()));
     }
 
     @Test
@@ -35,6 +40,8 @@ class ItemOSTest {
     void deveLancarExcecaoParaQuantidadeNegativa() {
         assertThrows(IllegalArgumentException.class, () ->
                 new ItemOS(UUID.randomUUID(), "Óleo Motor",
-                        new BigDecimal("50.00"), -1));
+                        new BigDecimal("50.00"),
+                        -1,
+                        new OrdemServico()));
     }
 }

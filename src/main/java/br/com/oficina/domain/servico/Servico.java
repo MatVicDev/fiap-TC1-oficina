@@ -42,7 +42,7 @@ public class Servico {
             this.descricao = descricao;
         }
 
-        if (valor != null && valor.compareTo(BigDecimal.ZERO) <= 0) {
+        if (valor != null && valor.compareTo(BigDecimal.ZERO) > 0) {
             this.valor = valor;
         }
 

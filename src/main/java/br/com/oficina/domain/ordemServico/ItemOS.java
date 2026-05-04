@@ -24,13 +24,14 @@ public class ItemOS {
     private BigDecimal precoUnitario;
     private Integer quantidade;
 
-    public ItemOS(UUID insumoId, String descricao, BigDecimal precoUnitario, Integer quantidade) {
+    public ItemOS(UUID insumoId, String descricao, BigDecimal precoUnitario, Integer quantidade, OrdemServico ordemServico) {
         if (quantidade <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
         this.id = UUID.randomUUID();
         this.insumoId = insumoId;
         this.descricao = descricao;
         this.precoUnitario = precoUnitario;
         this.quantidade = quantidade;
+        this.ordemServico = ordemServico;
     }
 
     public BigDecimal getPrecoTotal() {
