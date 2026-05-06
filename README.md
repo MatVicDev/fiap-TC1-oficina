@@ -346,7 +346,7 @@ fiap-TC1-oficina/
 
 | Nome | RM | Discord |
 |---|---|---|
-| Matheus Victor Moreira Mendes | rm373132 | *seu username* |
+| Matheus Victor Moreira Mendes | rm373132 | m.victor99 |
 
 ---
 
