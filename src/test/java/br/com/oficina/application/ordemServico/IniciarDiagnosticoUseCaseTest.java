@@ -27,6 +27,9 @@ class IniciarDiagnosticoUseCaseTest {
     @Mock
     private OrdemServicoRepository repository;
 
+    @Mock
+    private NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
+
     @InjectMocks
     private IniciarDiagnosticoUseCase useCase;
 

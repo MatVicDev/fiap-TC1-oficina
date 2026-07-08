@@ -27,6 +27,9 @@ class ConcluirDiagnosticoUseCaseTest {
     @Mock
     private OrdemServicoRepository repository;
 
+    @Mock
+    private NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
+
     @InjectMocks
     private ConcluirDiagnosticoUseCase useCase;
 

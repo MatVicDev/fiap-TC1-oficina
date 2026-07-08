@@ -37,6 +37,9 @@ class CriarOrdemServicoUseCaseTest {
     @Mock
     private VeiculoRepository veiculoRepository;
 
+    @Mock
+    private NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
+
     @InjectMocks
     private CriarOrdemServicoUseCase useCase;
 
