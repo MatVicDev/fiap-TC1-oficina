@@ -11,21 +11,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AtualizarEstoqueUseCase {
+public class ReduzirEstoqueUseCase {
     private final EstoqueRepository estoqueRepository;
 
     @Transactional
-    public void repor(UUID insumoId, Integer quantidade) {
-        Estoque estoque = estoqueRepository.buscarPorInsumoId(insumoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Estoque não encontrado"));
-
-        estoque.repor(quantidade);
-
-        estoqueRepository.salvar(estoque);
-    }
-
-    @Transactional
-    public void reduzir(UUID insumoId, Integer quantidade) {
+    public void executar(UUID insumoId, Integer quantidade) {
         Estoque estoque = estoqueRepository.buscarPorInsumoId(insumoId)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Estoque não encontrado"));
 

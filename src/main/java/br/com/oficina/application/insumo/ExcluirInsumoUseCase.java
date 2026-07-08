@@ -11,15 +11,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ExcluirInsumoUseCase {
-    private final InsumoRepository repository;
+    private final InsumoRepository insumoRepository;
     private final EstoqueRepository estoqueRepository;
 
     public void executar(UUID id) {
-        repository.buscarPorId(id)
+        insumoRepository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Insumo não encontrado"));
 
         estoqueRepository.excluirPorInsumoId(id);
 
-        repository.excluir(id);
+        insumoRepository.excluir(id);
     }
 }

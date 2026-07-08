@@ -18,7 +18,7 @@ import java.util.UUID;
 public class VeiculoController {
     private final CadastrarVeiculoUseCase cadastrarVeiculoUseCase;
     private final ListarVeiculosUseCase listarVeiculosUseCase;
-    private final ListarVeiculoPorCpfProprietarioUseCase listarVeiculoPorCpfProprietarioUseCase;
+    private final ListarVeiculosPorCpfProprietarioUseCase listarVeiculosPorCpfProprietarioUseCase;
     private final BuscarVeiculoUseCase buscarVeiculoUseCase;
     private final AtualizarVeiculoUseCase atualizarVeiculoUseCase;
     private final ExcluirVeiculoUseCase excluirVeiculoUseCase;
@@ -35,7 +35,7 @@ public class VeiculoController {
 
     @GetMapping("/proprietario/{cpf}")
     public ResponseEntity<List<VeiculoResponse>> listarPorProprietario(@PathVariable String cpf) {
-        return ResponseEntity.ok(listarVeiculoPorCpfProprietarioUseCase.executar(cpf));
+        return ResponseEntity.ok(listarVeiculosPorCpfProprietarioUseCase.executar(cpf));
     }
 
     @GetMapping("/{id}")

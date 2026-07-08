@@ -12,7 +12,7 @@ public interface ClienteRepository {
 
     Optional<Cliente> buscarPorCpf(Cpf cpf);
 
-    List<Cliente> listarClientes();
+    List<Cliente> listarTodos();
 
     boolean existePorCpf(Cpf cpf);
 

@@ -22,9 +22,9 @@ public class AuthController {
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(), request.password()));
+                        request.usuario(), request.senha()));
 
-        String token = jwtService.gerarToken(request.username());
+        String token = jwtService.gerarToken(request.usuario());
         return ResponseEntity.ok(token);
     }
 }

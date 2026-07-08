@@ -11,13 +11,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BuscarOSUseCase {
+public class BuscarOrdemServicoUseCase {
     private final OrdemServicoRepository repository;
 
     public OrdemServicoResponse executar(UUID id) {
-        OrdemServico ordemServico = repository.buscarPorId(id)
+        OrdemServico os = repository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Ordem de serviço não encontrada"));
 
-        return OrdemServicoMapper.toResponse(ordemServico);
+        return OrdemServicoMapper.toResponse(os);
     }
 }

@@ -92,7 +92,7 @@ class OrdemServicoTest {
                 2,
                 new OrdemServico());
 
-        ordemServico.adicionarItemOs(item);
+        ordemServico.adicionarItemOS(item);
 
         assertEquals(new BigDecimal("100.00"), ordemServico.getValorTotal());
     }
@@ -111,6 +111,6 @@ class OrdemServicoTest {
                 2,
                 new OrdemServico());
 
-        assertThrows(Exception.class, () -> ordemServico.adicionarItemOs(item));
+        assertThrows(Exception.class, () -> ordemServico.adicionarItemOS(item));
     }
 }

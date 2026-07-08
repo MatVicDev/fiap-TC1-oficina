@@ -15,16 +15,16 @@ import java.util.Date;
 public class JWTService {
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String chaveSecreta;
 
     @Value("${jwt.expiration}")
-    private Long expiration;
+    private Long tempoExpiracaoMs;
 
     public String gerarToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + tempoExpiracaoMs))
                 .signWith(getSecretKey())
                 .compact();
     }
@@ -52,7 +52,7 @@ public class JWTService {
 
     private SecretKey getSecretKey() {
         byte[] keyBytes = Decoders.BASE64.decode(
-                Base64.getEncoder().encodeToString(secret.getBytes()));
+                Base64.getEncoder().encodeToString(chaveSecreta.getBytes()));
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

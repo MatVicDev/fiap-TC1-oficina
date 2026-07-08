@@ -33,18 +33,18 @@ class ListarClientesUseCaseTest {
                 new Cliente("Matheus Victor", "12345678909", "41999999999", "matheus@email.com"),
                 new Cliente("João Silva", "11144477735", "41988888888", "joao@email.com"));
 
-        when(repository.listarClientes()).thenReturn(clientes);
+        when(repository.listarTodos()).thenReturn(clientes);
 
         List<ClienteResponse> response = useCase.executar();
 
         assertEquals(2, response.size());
-        verify(repository, times(1)).listarClientes();
+        verify(repository, times(1)).listarTodos();
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não há clientes")
     void deveRetornarListaVaziaQuandoNaoHaClientes() {
-        when(repository.listarClientes()).thenReturn(List.of());
+        when(repository.listarTodos()).thenReturn(List.of());
 
         List<ClienteResponse> response = useCase.executar();
 

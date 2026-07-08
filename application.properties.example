@@ -3,3 +3,11 @@ spring.datasource.username=seu_usuario
 spring.datasource.password=sua_senha
 jwt.secret=sua_chave_secreta
 jwt.expiration=86400000
+
+# Notificação por e-mail (desenvolvimento local aponta para o MailHog do docker-compose)
+spring.mail.host=localhost
+spring.mail.port=1025
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false

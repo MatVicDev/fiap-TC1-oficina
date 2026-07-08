@@ -19,7 +19,7 @@ class ClienteTest {
 
         assertNotNull(cliente.getId());
         assertEquals("Matheus Victor", cliente.getNome());
-        assertEquals("12345678909", cliente.getCpfFormatado());
+        assertEquals("12345678909", cliente.getCpfNumero());
         assertNotNull(cliente.getDataCadastro());
     }
 

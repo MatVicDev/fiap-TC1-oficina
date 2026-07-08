@@ -16,7 +16,7 @@ public class CadastrarServicoUseCase {
         Servico servico = new Servico(
                 request.nome(),
                 request.descricao(),
-                request.valor(),
+                request.precoBase(),
                 request.tempoPrevisto());
 
         repository.salvar(servico);

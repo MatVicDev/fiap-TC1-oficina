@@ -34,7 +34,7 @@ public interface ClienteRepositoryJpa extends JpaRepository<Cliente, UUID>, Clie
     }
 
     @Override
-    default List<Cliente> listarClientes() {
+    default List<Cliente> listarTodos() {
         return findAll();
     }
 

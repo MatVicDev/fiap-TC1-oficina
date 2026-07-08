@@ -6,13 +6,13 @@ import java.util.UUID;
 
 public interface OrdemServicoRepository {
 
-    OrdemServico salvar(OrdemServico novaOS);
+    OrdemServico salvar(OrdemServico ordemServico);
 
     Optional<OrdemServico> buscarPorId(UUID id);
 
-    List<OrdemServico> listarOrdemServicos();
+    List<OrdemServico> listarTodos();
 
-    List<OrdemServico> listarOrdemServicoPorStatus(StatusOS status);
+    List<OrdemServico> listarOrdemServicosPorStatus(StatusOS status);
 
     boolean existePorId(UUID id);
 }

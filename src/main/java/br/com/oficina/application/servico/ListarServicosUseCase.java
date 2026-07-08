@@ -13,7 +13,7 @@ public class ListarServicosUseCase {
     private final ServicoRepository repository;
 
     public List<ServicoResponse> executar() {
-        return repository.buscarTodos().stream()
+        return repository.listarTodos().stream()
                 .map(ServicoMapper::toResponse)
                 .toList();
     }

@@ -33,18 +33,18 @@ class ListarVeiculosUseCaseTest {
                 new Veiculo("ABC1D23", "Toyota", "Corolla", 2020, "Prata", "12345678901"),
                 new Veiculo("XYZ9K87", "Honda", "Civic", 2021, "Preto", "98765432100"));
 
-        when(repository.listarVeiculos()).thenReturn(veiculos);
+        when(repository.listarTodos()).thenReturn(veiculos);
 
         List<VeiculoResponse> response = useCase.executar();
 
         assertEquals(2, response.size());
-        verify(repository, times(1)).listarVeiculos();
+        verify(repository, times(1)).listarTodos();
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não há veículos")
     void deveRetornarListaVaziaQuandoNaoHaVeiculos() {
-        when(repository.listarVeiculos()).thenReturn(List.of());
+        when(repository.listarTodos()).thenReturn(List.of());
 
         List<VeiculoResponse> response = useCase.executar();
 

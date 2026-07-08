@@ -10,7 +10,7 @@ public class ServicoMapper {
                 servico.getId(),
                 servico.getNome(),
                 servico.getDescricao(),
-                servico.getValor(),
+                servico.getPrecoBase(),
                 servico.getTempoPrevisto());
     }
 }

@@ -32,7 +32,7 @@ public interface VeiculoRepositoryJpa extends JpaRepository<Veiculo, UUID>, Veic
     Optional<Veiculo> findByPlaca(Placa placa);
 
     @Override
-    default List<Veiculo> listarVeiculos() {
+    default List<Veiculo> listarTodos() {
         return findAll();
     }
 

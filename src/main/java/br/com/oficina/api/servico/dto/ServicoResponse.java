@@ -7,6 +7,6 @@ public record ServicoResponse(
         UUID id,
         String nome,
         String descricao,
-        BigDecimal valor,
+        BigDecimal precoBase,
         Integer tempoPrevisto
 ) {}

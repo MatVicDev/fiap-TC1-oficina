@@ -1,6 +1,6 @@
 package br.com.oficina.application.ordemServico;
 
-import br.com.oficina.api.ordemServico.dto.CriarOSRequest;
+import br.com.oficina.api.ordemServico.dto.CriarOrdemServicoRequest;
 import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.domain.cliente.Cliente;
 import br.com.oficina.domain.cliente.ClienteRepository;
@@ -17,13 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CriarOSUseCase {
+public class CriarOrdemServicoUseCase {
     private final OrdemServicoRepository osRepository;
     private final ClienteRepository clienteRepository;
     private final VeiculoRepository veiculoRepository;
+    private final NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
 
     @Transactional
-    public OrdemServicoResponse executar(CriarOSRequest request) {
+    public OrdemServicoResponse executar(CriarOrdemServicoRequest request) {
         Cliente cliente = clienteRepository.buscarPorCpf(new Cpf(request.cpfCliente()))
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Cliente não encontrado"));
 
@@ -36,6 +37,7 @@ public class CriarOSUseCase {
                 request.sintomaRelatado());
 
         osRepository.salvar(os);
+        notificarStatusOrdemServicoService.notificarMudancaStatus(os);
 
         return OrdemServicoMapper.toResponse(os);
     }

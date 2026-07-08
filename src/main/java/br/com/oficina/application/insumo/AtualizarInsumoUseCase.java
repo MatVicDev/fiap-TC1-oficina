@@ -16,12 +16,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AtualizarInsumoUseCase {
-    private final InsumoRepository repository;
+    private final InsumoRepository insumoRepository;
     private final EstoqueRepository estoqueRepository;
 
     @Transactional
     public InsumoResponse executar(UUID id, AtualizarInsumoRequest request) {
-        Insumo insumo = repository.buscarPorId(id)
+        Insumo insumo = insumoRepository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Insumo não encontrado"));
 
         Estoque estoque = estoqueRepository.buscarPorInsumoId(id)
@@ -33,7 +33,7 @@ public class AtualizarInsumoUseCase {
                 request.precoBase(),
                 request.tipo());
 
-        repository.salvar(insumo);
+        insumoRepository.salvar(insumo);
 
         return InsumoMapper.toResponse(insumo, estoque);
     }

@@ -23,8 +23,18 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DATABASE_NAME}
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
     depends_on:
       - postgres
+      - mailhog
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: oficina-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   postgres-data:

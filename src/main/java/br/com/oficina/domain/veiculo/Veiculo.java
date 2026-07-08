@@ -42,7 +42,7 @@ public class Veiculo {
         }
     }
 
-    public void atualizar(String novaMarca, String novaModelo, Integer novaAno, String novaCor) {
+    public void atualizar(String novaMarca, String novaModelo, Integer novoAno, String novaCor) {
         if (novaMarca != null && !novaMarca.isBlank()) {
             this.marca = novaMarca;
         }
@@ -51,8 +51,8 @@ public class Veiculo {
             this.modelo = novaModelo;
         }
 
-        if (novaAno != null)  {
-            this.ano = novaAno;
+        if (novoAno != null)  {
+            this.ano = novoAno;
         }
 
         if (novaCor != null && !novaCor.isBlank()) {

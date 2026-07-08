@@ -1,6 +1,6 @@
 package br.com.oficina.api.ordemServico;
 
-import br.com.oficina.api.ordemServico.dto.CriarOSRequest;
+import br.com.oficina.api.ordemServico.dto.CriarOrdemServicoRequest;
 import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.application.ordemServico.*;
 import jakarta.validation.Valid;
@@ -16,30 +16,30 @@ import java.util.UUID;
 @RequestMapping("/ordens-servico")
 @RequiredArgsConstructor
 public class OrdemServicoController {
-    private final CriarOSUseCase criarOSUseCase;
-    private final ListarOSUseCase listarOSUseCase;
-    private final BuscarOSUseCase buscarOSUseCase;
+    private final CriarOrdemServicoUseCase criarOrdemServicoUseCase;
+    private final ListarOrdensDeServicoUseCase listarOrdensDeServicoUseCase;
+    private final BuscarOrdemServicoUseCase buscarOrdemServicoUseCase;
     private final IniciarDiagnosticoUseCase iniciarDiagnosticoUseCase;
     private final ConcluirDiagnosticoUseCase concluirDiagnosticoUseCase;
     private final AprovarOrcamentoUseCase aprovarOrcamentoUseCase;
     private final RejeitarOrcamentoUseCase rejeitarOrcamentoUseCase;
     private final ConcluirOrdemServicoUseCase concluirOrdemServicoUseCase;
     private final RegistrarEntregaUseCase registrarEntregaUseCase;
-    private final AdicionarItemOSUseCase adicionarItemOSUseCase;
+    private final AdicionarItemOrdemServicoUseCase adicionarItemOrdemServicoUseCase;
 
     @PostMapping
-    public ResponseEntity<OrdemServicoResponse> criar(@Valid @RequestBody CriarOSRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(criarOSUseCase.executar(request));
+    public ResponseEntity<OrdemServicoResponse> criar(@Valid @RequestBody CriarOrdemServicoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(criarOrdemServicoUseCase.executar(request));
     }
 
     @GetMapping
     public ResponseEntity<List<OrdemServicoResponse>> listar() {
-        return ResponseEntity.ok(listarOSUseCase.executar());
+        return ResponseEntity.ok(listarOrdensDeServicoUseCase.executar());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrdemServicoResponse> buscarPorId(@PathVariable UUID id) {
-        return ResponseEntity.ok(buscarOSUseCase.executar(id));
+        return ResponseEntity.ok(buscarOrdemServicoUseCase.executar(id));
     }
 
     @PatchMapping("/{id}/diagnostico/iniciar")
@@ -77,6 +77,6 @@ public class OrdemServicoController {
             @PathVariable UUID id,
             @RequestParam UUID insumoId,
             @RequestParam Integer quantidade) {
-        return ResponseEntity.ok(adicionarItemOSUseCase.executar(id, insumoId, quantidade));
+        return ResponseEntity.ok(adicionarItemOrdemServicoUseCase.executar(id, insumoId, quantidade));
     }
 }

@@ -14,7 +14,7 @@ public interface VeiculoRepository {
 
     Optional<Veiculo> buscarPorId(UUID id);
 
-    List<Veiculo> listarVeiculos();
+    List<Veiculo> listarTodos();
 
     List<Veiculo> listarPorCpfProprietario(Cpf cpf);
 

@@ -21,7 +21,7 @@ public interface ServicoRepositoryJpa extends JpaRepository<Servico, UUID>, Serv
     }
 
     @Override
-    default List<Servico> buscarTodos() {
+    default List<Servico> listarTodos() {
         return findAll();
     }
 
