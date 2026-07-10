@@ -6,5 +6,5 @@ target/
 *.pdf
 *.txt
 .env
-application.properties
-application.properties.example
+**/application.properties
+**/application.properties.example
