@@ -96,18 +96,21 @@ jobs:
           curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
 
-      - name: Provisionar cluster e aplicar manifestos (Terraform)
+      - name: Provisionar cluster (Terraform)
         working-directory: infra
         run: |
           terraform init
-          terraform apply -auto-approve
+          terraform apply -auto-approve -target=kind_cluster.oficina
 
-      - name: Carregar imagem no cluster e aguardar rollout
+      - name: Carregar imagem no cluster
+        run: kind load docker-image oficina-app:latest --name oficina
+
+      - name: Aplicar manifestos e aguardar rollout (Terraform)
+        working-directory: infra
         run: |
-          kind load docker-image oficina-app:latest --name oficina
+          terraform apply -auto-approve
           export KUBECONFIG="${GITHUB_WORKSPACE}/infra/oficina-config"
-          kubectl rollout restart deployment/oficina-app -n oficina
-          kubectl rollout status deployment/oficina-app -n oficina --timeout=120s
+          kubectl rollout status deployment/oficina-app -n oficina --timeout=180s
 
       - name: Smoke test da API
         run: |

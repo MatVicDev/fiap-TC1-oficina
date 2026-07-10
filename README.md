@@ -157,11 +157,12 @@ O cluster **kind** e os manifestos de `/k8s` são provisionados pelo Terraform e
 docker build -t oficina-app:latest .
 cd infra
 terraform init
-terraform apply
+terraform apply -target=kind_cluster.oficina   # só o cluster
 kind load docker-image oficina-app:latest --name oficina
+terraform apply                                # aplica os manifestos de /k8s
 ```
 
-O `terraform apply` cria o cluster kind (com as portas 8080 e 8025 já mapeadas para o host) e aplica todos os manifestos de `/k8s`. O `kind load docker-image` precisa rodar depois, pois só existe cluster para carregar a imagem após o `apply`. Rodar `terraform apply` de novo reaplica os manifestos caso algum arquivo em `/k8s` mude.
+O primeiro `apply` cria só o cluster kind (com as portas 8080 e 8025 já mapeadas para o host), para dar tempo de carregar a imagem antes de qualquer pod ser agendado — se os manifestos forem aplicados antes da imagem existir no cluster, os pods da app entram em `ImagePullBackOff`. O segundo `apply` aplica os manifestos de `/k8s`; rodar de novo reaplica caso algum arquivo em `/k8s` mude.
 
 Para destruir o cluster: `terraform destroy` dentro de `/infra`.
 
