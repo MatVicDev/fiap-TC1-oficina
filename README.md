@@ -99,14 +99,10 @@ cd fiap-TC1-oficina
 
 **2. Configure as variáveis de ambiente**
 
-Crie um arquivo `.env` na raiz do projeto com base no exemplo abaixo:
+Copie o arquivo de exemplo e ajuste os valores conforme necessário:
 
-```env
-DATABASE_USER=postgres
-DATABASE_PASSWORD=postgres
-DATABASE_NAME=oficina
-JWT_SECRET=sua-chave-secreta-de-pelo-menos-32-caracteres
-JWT_EXPIRATION=86400000
+```bash
+cp .env.example .env
 ```
 
 **3. Suba o ambiente completo**
@@ -117,6 +113,7 @@ docker-compose up --build
 
 Este comando irá:
 - Baixar e iniciar o container do **PostgreSQL 16**
+- Baixar e iniciar o container do **MailHog** (SMTP de teste, UI em http://localhost:8025)
 - Compilar e iniciar o container da **aplicação Spring Boot**
 - Criar automaticamente todas as tabelas via Hibernate
 
@@ -127,6 +124,42 @@ Este comando irá:
 | API | http://localhost:8080                       |
 | Swagger UI | http://localhost:8080/swagger-ui/index.html |
 | API Docs (JSON) | http://localhost:8080/v3/api-docs           |
+| MailHog (e-mails de teste) | http://localhost:8025          |
+
+---
+
+## ☸️ Deploy em Kubernetes
+
+Os manifestos ficam em `/k8s`, com prefixo numérico para garantir a ordem de aplicação (namespace → config → segredos → banco → mailhog → app → HPA):
+
+```
+k8s/
+├── 00-namespace.yaml    # namespace "oficina"
+├── 01-configmap.yaml    # config não sensível (URL do banco, host/porta do SMTP, etc.)
+├── 02-secret.yaml       # credenciais do banco e chave JWT (valores placeholder — troque antes de usar fora do seu ambiente local)
+├── 03-postgres.yaml     # PersistentVolumeClaim + Deployment + Service do Postgres
+├── 04-mailhog.yaml      # Deployment + Service do MailHog
+├── 05-app.yaml          # Deployment + Service da aplicação
+└── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
+```
+
+### Pré-requisitos
+
+- Um cluster Kubernetes acessível via `kubectl` (o provisionamento de um cluster local via **kind** é feito pelo Terraform em `/infra`, na próxima etapa).
+- O **metrics-server** instalado no cluster — sem ele, o HPA não consegue ler métricas de CPU e não escala (kind não vem com ele por padrão).
+- A imagem `oficina-app:latest` já construída e disponível para o cluster (em kind, isso é feito com `kind load docker-image oficina-app:latest`, sem precisar de um registry).
+
+### Aplicar
+
+```bash
+docker build -t oficina-app:latest .
+kind load docker-image oficina-app:latest   # apenas em cluster kind local
+kubectl apply -f k8s/
+```
+
+### Acessar
+
+Como a app e o MailHog usam `Service` do tipo `NodePort`, em um cluster kind com o mapeamento de portas configurado (feito pelo Terraform) a API fica em `http://localhost:8080` e a UI do MailHog em `http://localhost:8025`, exatamente como no `docker-compose`. Sem esse mapeamento, use `kubectl port-forward service/oficina-app 8080:8080 -n oficina`.
 
 ---
 
@@ -331,8 +364,11 @@ fiap-TC1-oficina/
 ├── src/
 │   ├── main/java/br/com/oficina/
 │   └── test/java/br/com/oficina/
-├── dockerfile
+├── k8s/                        # Manifestos Kubernetes (Deployments, Services, ConfigMap, Secret, HPA)
+├── Dockerfile
 ├── docker-compose.yml
+├── .dockerignore
+├── .env.example
 ├── pom.xml
 ├── trivy-report.txt
 ├── relatorio_vulnerabilidades.pdf
