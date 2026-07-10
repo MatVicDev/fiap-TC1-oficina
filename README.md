@@ -145,21 +145,29 @@ k8s/
 
 ### Pré-requisitos
 
-- Um cluster Kubernetes acessível via `kubectl` (o provisionamento de um cluster local via **kind** é feito pelo Terraform em `/infra`, na próxima etapa).
+- `docker`, `kind`, `kubectl` e `terraform` (>= 1.5) instalados.
+- A imagem `oficina-app:latest` já construída (`docker build -t oficina-app:latest .` na raiz do projeto).
 - O **metrics-server** instalado no cluster — sem ele, o HPA não consegue ler métricas de CPU e não escala (kind não vem com ele por padrão).
-- A imagem `oficina-app:latest` já construída e disponível para o cluster (em kind, isso é feito com `kind load docker-image oficina-app:latest`, sem precisar de um registry).
 
 ### Aplicar
 
+O cluster **kind** e os manifestos de `/k8s` são provisionados pelo Terraform em `/infra`:
+
 ```bash
 docker build -t oficina-app:latest .
-kind load docker-image oficina-app:latest   # apenas em cluster kind local
-kubectl apply -f k8s/
+cd infra
+terraform init
+terraform apply
+kind load docker-image oficina-app:latest --name oficina
 ```
+
+O `terraform apply` cria o cluster kind (com as portas 8080 e 8025 já mapeadas para o host) e aplica todos os manifestos de `/k8s`. O `kind load docker-image` precisa rodar depois, pois só existe cluster para carregar a imagem após o `apply`. Rodar `terraform apply` de novo reaplica os manifestos caso algum arquivo em `/k8s` mude.
+
+Para destruir o cluster: `terraform destroy` dentro de `/infra`.
 
 ### Acessar
 
-Como a app e o MailHog usam `Service` do tipo `NodePort`, em um cluster kind com o mapeamento de portas configurado (feito pelo Terraform) a API fica em `http://localhost:8080` e a UI do MailHog em `http://localhost:8025`, exatamente como no `docker-compose`. Sem esse mapeamento, use `kubectl port-forward service/oficina-app 8080:8080 -n oficina`.
+Como a app e o MailHog usam `Service` do tipo `NodePort`, com o mapeamento de portas feito pelo Terraform a API fica em `http://localhost:8080` e a UI do MailHog em `http://localhost:8025`, exatamente como no `docker-compose`. Sem esse mapeamento, use `kubectl port-forward service/oficina-app 8080:8080 -n oficina`.
 
 ---
 
@@ -174,8 +182,8 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin123"
+  "usuario": "admin",
+  "senha": "admin123"
 }
 ```
 
@@ -365,6 +373,7 @@ fiap-TC1-oficina/
 │   ├── main/java/br/com/oficina/
 │   └── test/java/br/com/oficina/
 ├── k8s/                        # Manifestos Kubernetes (Deployments, Services, ConfigMap, Secret, HPA)
+├── infra/                      # Terraform: provisiona o cluster kind e aplica os manifestos de /k8s
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .dockerignore
