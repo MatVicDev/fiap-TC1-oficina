@@ -111,8 +111,13 @@ jobs:
 
       - name: Smoke test da API
         run: |
-          curl -fsS http://localhost:8080/v3/api-docs > /dev/null
-          curl -fsS -X POST http://localhost:8080/auth/login \
+          # rollout status confirma os pods Ready, mas o kube-proxy do kind pode levar
+          # alguns segundos a mais para propagar as regras de iptables do NodePort —
+          # --retry-all-errors absorve esse atraso em vez de falhar na primeira tentativa.
+          curl -fsS --retry 10 --retry-delay 3 --retry-all-errors \
+            http://localhost:8080/v3/api-docs > /dev/null
+          curl -fsS --retry 5 --retry-delay 3 --retry-all-errors \
+            -X POST http://localhost:8080/auth/login \
             -H "Content-Type: application/json" \
             -d '{"usuario":"admin","senha":"admin123"}' > /dev/null
           echo "Smoke test OK"
