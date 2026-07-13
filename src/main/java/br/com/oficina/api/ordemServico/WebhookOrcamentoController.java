@@ -3,6 +3,7 @@ package br.com.oficina.api.ordemServico;
 import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.api.ordemServico.dto.WebhookOrcamentoDecisaoRequest;
 import br.com.oficina.application.ordemServico.ProcessarNotificacaoOrcamentoUseCase;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class WebhookOrcamentoController {
     private final ProcessarNotificacaoOrcamentoUseCase processarNotificacaoOrcamentoUseCase;
 
+    @SecurityRequirements
     @PostMapping("/{id}/orcamento")
     public ResponseEntity<OrdemServicoResponse> receberDecisao(
             @PathVariable UUID id, @Valid @RequestBody WebhookOrcamentoDecisaoRequest request) {
