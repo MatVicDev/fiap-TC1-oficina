@@ -40,7 +40,50 @@ O **PostgreSQL** foi escolhido por ser um banco relacional robusto, open-source 
 
 ## 🏗 Arquitetura
 
-O projeto segue **arquitetura em camadas** com princípios de **DDD (Domain-Driven Design)**:
+O projeto segue **arquitetura em camadas** (Clean Architecture / Hexagonal) com princípios de **DDD (Domain-Driven Design)**. A regra de dependência aponta sempre para dentro: `api` depende de `application`, que depende de `domain`; `infrastructure` implementa as interfaces (portas) definidas no `domain`, e nunca o contrário.
+
+```mermaid
+flowchart TB
+    Client["Cliente HTTP<br/>(Postman / Swagger UI)"]
+    ExtSystem["Sistema externo<br/>de orçamento"]
+    Security["JWT / Spring Security"]
+    OpenApi["OpenApiConfig (Swagger)"]
+
+    subgraph API["api — Controllers REST + DTOs"]
+        Controllers["AuthController · ClienteController<br/>VeiculoController · ServicoController<br/>InsumoController · OrdemServicoController<br/>WebhookOrcamentoController"]
+    end
+
+    subgraph APPLICATION["application — Casos de uso"]
+        UseCases["CadastrarCliente · CriarOrdemServico<br/>AprovarOrcamento · ReporEstoque · ..."]
+    end
+
+    subgraph DOMAIN["domain — Regras de negócio puras (sem dependências externas)"]
+        Entities["Entidades e Value Objects<br/>Cliente, Veiculo, OrdemServico,<br/>Insumo, Servico, Estoque, Cpf, Placa"]
+        Ports["Portas (interfaces)<br/>*Repository · NotificacaoService"]
+    end
+
+    subgraph INFRA["infrastructure — Adaptadores de saída"]
+        JpaAdapter["Repositórios JPA"]
+        EmailAdapter["EmailNotificacaoAdapter"]
+    end
+
+    Postgres[("PostgreSQL")]
+    Smtp[("MailHog / SMTP")]
+
+    Client --> Controllers
+    ExtSystem --> Controllers
+    Security -.protege.-> Controllers
+    OpenApi -.documenta.-> Controllers
+
+    Controllers --> UseCases
+    UseCases --> Entities
+    UseCases --> Ports
+
+    Ports -.implementada por.-> JpaAdapter
+    Ports -.implementada por.-> EmailAdapter
+    JpaAdapter --> Postgres
+    EmailAdapter --> Smtp
+```
 
 ```
 src/main/java/br/com/oficina/
@@ -49,7 +92,10 @@ src/main/java/br/com/oficina/
 │   ├── veiculo/         # Entidade Veiculo + Value Object Placa
 │   ├── ordemServico/    # Aggregate Root OrdemServico + ItemOS + Orcamento
 │   ├── insumo/          # Entidade Insumo
-│   └── estoque/         # Entidade Estoque
+│   ├── estoque/         # Entidade Estoque
+│   ├── servico/         # Entidade Servico
+│   ├── notificacao/     # Porta NotificacaoService
+│   └── exception/       # Exceções de domínio
 │
 ├── application/         # Casos de uso — orquestra o domínio
 │   ├── cliente/
@@ -58,11 +104,14 @@ src/main/java/br/com/oficina/
 │   ├── insumo/
 │   └── servico/
 │
-├── infrastructure/      # Detalhes técnicos — JPA, segurança
-│   ├── persistence/
-│   └── security/
+├── infrastructure/      # Detalhes técnicos — adaptadores de saída
+│   ├── persistence/     # Repositórios JPA (implementam as portas do domain)
+│   ├── security/        # JWT, Spring Security
+│   ├── notificacao/     # EmailNotificacaoAdapter (implementa NotificacaoService)
+│   └── openapi/         # Configuração do Swagger (SecurityScheme JWT)
 │
 └── api/                 # Controllers REST + DTOs
+    ├── auth/
     ├── cliente/
     ├── veiculo/
     ├── ordemServico/
