@@ -1,6 +1,6 @@
 # 🚗 Oficina Mecânica — Sistema de Gestão
 
-> Back-end do sistema de gestão de uma oficina mecânica, desenvolvido como Tech Challenge da Fase 1 do programa **SOAT — Software Architecture** da FIAP.
+> Back-end do sistema de gestão de uma oficina mecânica, desenvolvido como Tech Challenge da Fase 2 do programa **SOAT — Software Architecture** da FIAP (evolução da Fase 1: Clean Architecture, containerização, Kubernetes, Terraform e CI/CD).
 
 ---
 
@@ -245,6 +245,8 @@ Authorization: Bearer <seu_token_aqui>
 
 > ⚠️ O token expira em 24 horas (configurável via `JWT_EXPIRATION`).
 
+**Testando pelo Swagger UI**: após o login, clique em **Authorize** (canto superior direito de `/swagger-ui/index.html`), cole o token e todos os endpoints protegidos ficam testáveis via "Try it out". Login (`/auth/login`) e o webhook de orçamento são públicos e não exigem esse passo.
+
 ---
 
 ## 📡 Endpoints Principais
@@ -289,6 +291,11 @@ Authorization: Bearer <seu_token_aqui>
 | PATCH | `/ordens-servico/{id}/entrega` | Registrar entrega | ✅ |
 | POST | `/ordens-servico/{id}/itens` | Adicionar item à OS | ✅ |
 
+### Webhook
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| POST | `/webhooks/ordens-servico/{id}/orcamento` | Receber decisão de orçamento de sistema externo | ❌ |
+
 ### Insumos e Estoque
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
@@ -331,13 +338,13 @@ ENTREGUE
 
 ## 🧪 Testes
 
-O projeto possui **106 testes unitários** com **91% de cobertura** nos domínios críticos (`domain` + `application`), superando com folga o mínimo exigido de 80%.
+O projeto possui **115 testes automatizados** (114 testes unitários + 1 teste de contexto Spring) com **90% de cobertura de linha** nos domínios críticos (`domain` + `application`), superando com folga o mínimo exigido de 80%.
 
 | Métrica | Resultado |
 |---|---|
-| Total de testes | 106 |
-| Testes passando | 106 ✅ |
-| Cobertura (domain + application) | **91%** |
+| Total de testes | 115 |
+| Testes passando | 115 ✅ |
+| Cobertura de linha (domain + application) | **90%** |
 | Meta exigida | 80% |
 | Ferramenta | JaCoCo 0.8.11 |
 
@@ -360,7 +367,7 @@ O projeto possui **106 testes unitários** com **91% de cobertura** nos domínio
 
 ```
 src/test/java/br/com/oficina/
-├── domain/
+├── domain/                     # 9 arquivos — 42 testes — regras de negócio puras
 │   ├── OrdemServicoTest.java      # 9 testes — transições de status
 │   ├── CpfTest.java               # 6 testes — validação CPF/CNPJ
 │   ├── PlacaTest.java             # 5 testes — validação de placa
@@ -370,11 +377,15 @@ src/test/java/br/com/oficina/
 │   ├── InsumoTest.java            # 3 testes — entidade insumo
 │   ├── OrcamentoTest.java         # 3 testes — entidade orçamento
 │   └── ItemOSTest.java            # 3 testes — item de OS
-└── application/
-    ├── CadastrarClienteUseCaseTest.java
-    ├── CriarOSUseCaseTest.java
-    ├── AprovarOrcamentoUseCaseTest.java
-    └── ... (30+ arquivos de teste)
+├── application/                # 32 arquivos — 70 testes — casos de uso
+│   ├── cliente/                    # 5 arquivos — 11 testes
+│   ├── veiculo/                    # 4 arquivos — 9 testes
+│   ├── servico/                    # 5 arquivos — 10 testes
+│   ├── insumo/                     # 7 arquivos — 14 testes (inclui repor/reduzir estoque)
+│   └── ordemServico/               # 11 arquivos — 26 testes (fluxo completo da OS + notificação)
+├── infrastructure/notificacao/
+│   └── EmailNotificacaoAdapterTest.java   # 2 testes — envio de e-mail e falha de SMTP
+└── OficinaApplicationTests.java   # 1 teste — carregamento do contexto Spring
 ```
 
 ---
@@ -392,7 +403,7 @@ src/test/java/br/com/oficina/
 
 ### Análise de vulnerabilidades
 
-Foi realizado scan de segurança utilizando **Trivy v0.70** nas dependências do projeto. O relatório completo está disponível em [`trivy-report.txt`](./trivy-report.txt) e a análise detalhada em [`relatorio_vulnerabilidades.pdf`](../../../../Downloads/relatorio_vulnerabilidades.pdf).
+Foi realizado scan de segurança utilizando **Trivy v0.70** nas dependências do projeto. O relatório completo está disponível em [`trivy-report.txt`](./trivy-report.txt) e a análise detalhada em [`relatorio_vulnerabilidades.pdf`](./relatorio_vulnerabilidades.pdf).
 
 **Resumo:**
 - 0 vulnerabilidades CRITICAL
