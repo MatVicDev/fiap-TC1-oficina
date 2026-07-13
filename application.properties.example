@@ -1,6 +1,7 @@
 spring.datasource.url=jdbc:postgresql://localhost:5432/seu_banco
 spring.datasource.username=seu_usuario
 spring.datasource.password=sua_senha
+spring.jpa.hibernate.ddl-auto=update
 jwt.secret=sua_chave_secreta
 jwt.expiration=86400000
 

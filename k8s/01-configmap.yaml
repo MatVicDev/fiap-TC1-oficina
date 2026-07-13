@@ -6,6 +6,7 @@ metadata:
 data:
   DATABASE_NAME: "oficina"
   SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/oficina"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
   SPRING_MAIL_HOST: "mailhog"
   SPRING_MAIL_PORT: "1025"
   JWT_EXPIRATION: "86400000"
