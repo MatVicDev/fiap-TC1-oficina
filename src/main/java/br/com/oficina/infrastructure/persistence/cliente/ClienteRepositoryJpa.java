@@ -25,7 +25,7 @@ public interface ClienteRepositoryJpa extends JpaRepository<Cliente, UUID>, Clie
 
     @Override
     default Optional<Cliente> buscarPorCpf(Cpf cpf) {
-        return findByCpfNumero(cpf.getNumero());
+        return findByCpf_Numero(cpf.getNumero());
     }
 
     @Override
@@ -40,10 +40,10 @@ public interface ClienteRepositoryJpa extends JpaRepository<Cliente, UUID>, Clie
 
     @Override
     default boolean existePorCpf(Cpf cpf) {
-        return existsByCpfNumero(cpf.getNumero());
+        return existsByCpf_Numero(cpf.getNumero());
     }
 
-    boolean existsByCpfNumero(String numero);
+    boolean existsByCpf_Numero(String numero);
 
-    Optional<Cliente> findByCpfNumero(String numero);
+    Optional<Cliente> findByCpf_Numero(String numero);
 }
