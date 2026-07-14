@@ -46,6 +46,8 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: postgres
           JWT_SECRET: chave-de-teste-para-ci-com-pelo-menos-32-caracteres
           JWT_EXPIRATION: "86400000"
+          ADMIN_USERNAME: admin
+          ADMIN_PASSWORD: senha-de-teste-para-ci
           SPRING_MAIL_HOST: localhost
           SPRING_MAIL_PORT: "1025"
 
@@ -122,7 +124,7 @@ jobs:
           curl -fsS --retry 5 --retry-delay 3 --retry-all-errors \
             -X POST http://localhost:8080/auth/login \
             -H "Content-Type: application/json" \
-            -d '{"usuario":"admin","senha":"admin123"}' > /dev/null
+            -d '{"usuario":"admin","senha":"troque-esta-senha-antes-de-usar-em-producao"}' > /dev/null
           echo "Smoke test OK"
 
       - name: Destruir cluster
