@@ -128,6 +128,56 @@ src/main/java/br/com/oficina/
 | **Execução** | Aprovação do orçamento e execução do serviço |
 | **Entrega** | Finalização, notificação e entrega do veículo |
 
+### Infraestrutura provisionada e fluxo de deploy
+
+```mermaid
+flowchart TB
+    Dev["Desenvolvedor"]
+
+    subgraph LOCAL["Ambiente local"]
+        Compose["docker-compose.yml"]
+        ComposeStack["app + PostgreSQL + MailHog<br/>(containers Docker)"]
+        Compose --> ComposeStack
+    end
+
+    subgraph CICD["CI/CD — GitHub Actions (.github/workflows/ci-cd.yml)"]
+        Test["job: test<br/>mvnw verify + Postgres de serviço<br/>gate JaCoCo ≥ 80%"]
+        Build["job: build-and-push<br/>docker build → push GHCR"]
+        Smoke["job: deploy-smoke-test<br/>cluster kind efêmero no runner"]
+        Test --> Build
+        Test --> Smoke
+    end
+
+    subgraph IAC["IaC — Terraform (/infra, provider kind)"]
+        TFCluster["terraform apply<br/>-target=kind_cluster.oficina"]
+        TFManifests["terraform apply<br/>(null_resource → kubectl apply -f /k8s)"]
+        TFCluster --> TFManifests
+    end
+
+    subgraph K8S["Kubernetes — namespace oficina (/k8s)"]
+        CM["ConfigMap + Secret<br/>(01, 02)"]
+        PG["Postgres<br/>Deployment + PVC + Service (03)"]
+        MH["MailHog<br/>Deployment + Service (04)"]
+        APP["oficina-app<br/>Deployment (2 réplicas) + Service NodePort (05)"]
+        HPA["HPA<br/>2–5 réplicas, 70% CPU (06)"]
+        APP -.escalado por.-> HPA
+        APP --> PG
+        APP --> MH
+        CM -.config/segredos.-> APP
+    end
+
+    Dev -- git push --> CICD
+    Dev -.uso diário.-> LOCAL
+    Smoke --> TFCluster
+    TFManifests --> CM
+    TFManifests --> PG
+    TFManifests --> MH
+    TFManifests --> APP
+    TFManifests --> HPA
+```
+
+O mesmo Terraform de `/infra` roda tanto localmente (seção [Deploy em Kubernetes](#☸️-deploy-em-kubernetes) abaixo) quanto dentro do job `deploy-smoke-test` do CI/CD: cria o cluster kind, carrega a imagem e aplica os manifestos de `/k8s`; a diferença é que no CI o cluster é destruído ao final (`terraform destroy`), servindo como teste de fumaça do provisionamento a cada push.
+
 ---
 
 ## 🚀 Como executar
