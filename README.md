@@ -273,7 +273,7 @@ Como a app e o MailHog usam `Service` do tipo `NodePort`, com o mapeamento de po
 
 ## 🔐 Autenticação
 
-As APIs administrativas são protegidas por **JWT**. O usuário e a senha do admin são configurados via as variáveis de ambiente `ADMIN_USERNAME`/`ADMIN_PASSWORD` (veja `.env.example`) — não há credencial fixa no código. Para acessar os endpoints protegidos:
+As APIs administrativas são protegidas por **JWT**. O usuário e a senha do admin vêm das variáveis de ambiente `ADMIN_USERNAME`/`ADMIN_PASSWORD` (não ficam mais fixas no código-fonte). Com os valores padrão do `.env.example`, o login é:
 
 **1. Faça login**
 
@@ -282,8 +282,8 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "usuario": "<ADMIN_USERNAME>",
-  "senha": "<ADMIN_PASSWORD>"
+  "usuario": "admin",
+  "senha": "troque-esta-senha-antes-de-usar-em-producao"
 }
 ```
 
