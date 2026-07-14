@@ -13,7 +13,7 @@ public record AtualizarServicoRequest(
         String descricao,
 
         @NotNull
-        BigDecimal valor,
+        BigDecimal precoBase,
 
         @NotNull
         Integer tempoPrevisto

@@ -8,7 +8,7 @@ public class ClienteMapper {
         return new ClienteResponse(
                 cliente.getId(),
                 cliente.getNome(),
-                cliente.getCpfFormatado(),
+                cliente.getCpfNumero(),
                 cliente.getTelefone(),
                 cliente.getEmail(),
                 cliente.getDataCadastro());

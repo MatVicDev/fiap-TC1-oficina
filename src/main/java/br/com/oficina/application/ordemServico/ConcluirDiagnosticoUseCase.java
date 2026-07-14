@@ -16,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ConcluirDiagnosticoUseCase {
     private final OrdemServicoRepository repository;
+    private final NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
 
     @Transactional
     public OrdemServicoResponse executar(UUID id) {
@@ -28,6 +29,7 @@ public class ConcluirDiagnosticoUseCase {
         os.setOrcamento(orcamento);
 
         repository.salvar(os);
+        notificarStatusOrdemServicoService.notificarMudancaStatus(os);
 
         return OrdemServicoMapper.toResponse(os);
     }

@@ -19,28 +19,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes do AtualizarEstoqueUseCase")
-class AtualizarEstoqueUseCaseTest {
+@DisplayName("Testes do ReduzirEstoqueUseCase")
+class ReduzirEstoqueUseCaseTest {
 
     @Mock
     private EstoqueRepository estoqueRepository;
 
     @InjectMocks
-    private AtualizarEstoqueUseCase useCase;
-
-    @Test
-    @DisplayName("Deve repor estoque com sucesso")
-    void deveReporEstoqueComSucesso() {
-        Estoque estoque = new Estoque(UUID.randomUUID(), 10);
-
-        when(estoqueRepository.buscarPorInsumoId(any()))
-                .thenReturn(Optional.of(estoque));
-
-        useCase.repor(UUID.randomUUID(), 5);
-
-        assertEquals(15, estoque.getQuantidade());
-        verify(estoqueRepository, times(1)).salvar(any());
-    }
+    private ReduzirEstoqueUseCase useCase;
 
     @Test
     @DisplayName("Deve reduzir estoque com sucesso")
@@ -50,7 +36,7 @@ class AtualizarEstoqueUseCaseTest {
         when(estoqueRepository.buscarPorInsumoId(any()))
                 .thenReturn(Optional.of(estoque));
 
-        useCase.reduzir(UUID.randomUUID(), 3);
+        useCase.executar(UUID.randomUUID(), 3);
 
         assertEquals(7, estoque.getQuantidade());
         verify(estoqueRepository, times(1)).salvar(any());
@@ -63,6 +49,6 @@ class AtualizarEstoqueUseCaseTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(EntidadeNaoEncontradaException.class,
-                () -> useCase.repor(UUID.randomUUID(), 5));
+                () -> useCase.executar(UUID.randomUUID(), 3));
     }
 }

@@ -18,22 +18,22 @@ public class Servico {
 
     private String nome;
     private String descricao;
-    private BigDecimal valor;
+    private BigDecimal precoBase;
     private Integer tempoPrevisto;
 
-    public Servico(String nome, String descricao, BigDecimal valor, Integer tempoPrevisto) {
-        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
+    public Servico(String nome, String descricao, BigDecimal precoBase, Integer tempoPrevisto) {
+        if (precoBase.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Não é permitido valores negativos");
         }
 
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.descricao = descricao;
-        this.valor = valor;
+        this.precoBase = precoBase;
         this.tempoPrevisto = tempoPrevisto;
     }
 
-    public void atualizar(String nome, String descricao, BigDecimal valor, Integer tempoPrevisto) {
+    public void atualizar(String nome, String descricao, BigDecimal precoBase, Integer tempoPrevisto) {
         if (nome != null && !nome.isBlank()) {
             this.nome = nome;
         }
@@ -42,8 +42,8 @@ public class Servico {
             this.descricao = descricao;
         }
 
-        if (valor != null && valor.compareTo(BigDecimal.ZERO) > 0) {
-            this.valor = valor;
+        if (precoBase != null && precoBase.compareTo(BigDecimal.ZERO) > 0) {
+            this.precoBase = precoBase;
         }
 
         if (tempoPrevisto != null && tempoPrevisto > 0) {
@@ -63,8 +63,8 @@ public class Servico {
         return descricao;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public BigDecimal getPrecoBase() {
+        return precoBase;
     }
 
     public Integer getTempoPrevisto() {

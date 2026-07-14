@@ -21,13 +21,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para buscar ordens de serviço")
-class BuscarOSUseCaseTest {
+class BuscarOrdemServicoUseCaseTest {
 
     @Mock
     private OrdemServicoRepository repository;
 
     @InjectMocks
-    private BuscarOSUseCase useCase;
+    private BuscarOrdemServicoUseCase useCase;
 
     @Test
     @DisplayName("Deve buscar OS por ID com sucesso")

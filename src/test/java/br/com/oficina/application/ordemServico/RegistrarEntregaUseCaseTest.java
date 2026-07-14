@@ -27,6 +27,9 @@ class RegistrarEntregaUseCaseTest {
     @Mock
     private OrdemServicoRepository repository;
 
+    @Mock
+    private NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
+
     @InjectMocks
     private RegistrarEntregaUseCase useCase;
 

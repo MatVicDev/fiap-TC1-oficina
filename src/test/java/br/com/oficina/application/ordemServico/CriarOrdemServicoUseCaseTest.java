@@ -1,6 +1,6 @@
 package br.com.oficina.application.ordemServico;
 
-import br.com.oficina.api.ordemServico.dto.CriarOSRequest;
+import br.com.oficina.api.ordemServico.dto.CriarOrdemServicoRequest;
 import br.com.oficina.api.ordemServico.dto.OrdemServicoResponse;
 import br.com.oficina.domain.cliente.Cliente;
 import br.com.oficina.domain.cliente.ClienteRepository;
@@ -25,8 +25,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes do CriarOSUseCase")
-class CriarOSUseCaseTest {
+@DisplayName("Testes do CriarOrdemServicoUseCase")
+class CriarOrdemServicoUseCaseTest {
 
     @Mock
     private OrdemServicoRepository osRepository;
@@ -37,8 +37,11 @@ class CriarOSUseCaseTest {
     @Mock
     private VeiculoRepository veiculoRepository;
 
+    @Mock
+    private NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
+
     @InjectMocks
-    private CriarOSUseCase useCase;
+    private CriarOrdemServicoUseCase useCase;
 
     @Test
     @DisplayName("Deve criar uma ordem de serviço com sucesso")
@@ -46,7 +49,7 @@ class CriarOSUseCaseTest {
         Cliente cliente = new Cliente("Matheus", "12345678909", "41999999999", "matheus@email.com");
         Veiculo veiculo = new Veiculo("ABC1D23", "Toyota", "Corolla", 2020, "Prata", "12345678901");
 
-        CriarOSRequest request = new CriarOSRequest(
+        CriarOrdemServicoRequest request = new CriarOrdemServicoRequest(
                 "12345678909",
                 "ABC1D23",
                 "Barulho no motor");
@@ -70,7 +73,7 @@ class CriarOSUseCaseTest {
     @Test
     @DisplayName("Deve lançar exceção quando cliente não for encontrado")
     void deveLancarExcecaoQuandoClienteNaoEncontrado() {
-        CriarOSRequest request = new CriarOSRequest(
+        CriarOrdemServicoRequest request = new CriarOrdemServicoRequest(
                 "12345678909",
                 "ABC1D23",
                 "Barulho no motor");
@@ -87,7 +90,7 @@ class CriarOSUseCaseTest {
     void deveLancarExcecaoQuandoVeiculoNaoEncontrado() {
         Cliente cliente = new Cliente("Matheus Victor", "12345678909", "41999999999", "matheus@email.com");
 
-        CriarOSRequest request = new CriarOSRequest(
+        CriarOrdemServicoRequest request = new CriarOrdemServicoRequest(
                 "12345678909",
                 "ABC1D23",
                 "Barulho no motor");

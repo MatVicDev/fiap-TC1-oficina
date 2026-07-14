@@ -14,11 +14,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BuscarInsumoUseCase {
-    private final InsumoRepository repository;
+    private final InsumoRepository insumoRepository;
     private final EstoqueRepository estoqueRepository;
 
     public InsumoResponse executar(UUID id) {
-        Insumo insumo = repository.buscarPorId(id)
+        Insumo insumo = insumoRepository.buscarPorId(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Insumo não encontrado"));
 
         Estoque estoque = estoqueRepository.buscarPorInsumoId(id)

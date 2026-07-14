@@ -2,6 +2,7 @@ package br.com.oficina.api.auth;
 
 import br.com.oficina.infrastructure.security.JWTService;
 import br.com.oficina.infrastructure.security.LoginRequest;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,13 +19,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
 
+    @SecurityRequirements
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(), request.password()));
+                        request.usuario(), request.senha()));
 
-        String token = jwtService.gerarToken(request.username());
+        String token = jwtService.gerarToken(request.usuario());
         return ResponseEntity.ok(token);
     }
 }

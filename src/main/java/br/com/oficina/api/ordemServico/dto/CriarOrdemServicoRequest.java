@@ -2,7 +2,7 @@ package br.com.oficina.api.ordemServico.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CriarOSRequest(
+public record CriarOrdemServicoRequest(
 
         @NotBlank
         String cpfCliente,

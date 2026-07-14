@@ -66,7 +66,7 @@ public class Cliente {
         return cpf;
     }
 
-    public String getCpfFormatado() {
+    public String getCpfNumero() {
         return cpf.getNumero();
     }
 

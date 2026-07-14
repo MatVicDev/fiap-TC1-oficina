@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ListarVeiculoPorCpfProprietarioUseCase {
+public class ListarVeiculosPorCpfProprietarioUseCase {
     private final VeiculoRepository repository;
 
     public List<VeiculoResponse> executar(String cpfProprietario) {

@@ -22,7 +22,8 @@ public class InsumoController {
     private final BuscarInsumoUseCase buscarInsumoUseCase;
     private final AtualizarInsumoUseCase atualizarInsumoUseCase;
     private final ExcluirInsumoUseCase excluirInsumoUseCase;
-    private final AtualizarEstoqueUseCase atualizarEstoqueUseCase;
+    private final ReporEstoqueUseCase reporEstoqueUseCase;
+    private final ReduzirEstoqueUseCase reduzirEstoqueUseCase;
 
     @PostMapping
     public ResponseEntity<InsumoResponse> cadastrar(@Valid @RequestBody CadastrarInsumoRequest request) {
@@ -52,13 +53,13 @@ public class InsumoController {
 
     @PatchMapping("/{id}/estoque/repor")
     public ResponseEntity<Void> reporEstoque(@PathVariable UUID id, @RequestParam Integer quantidade) {
-        atualizarEstoqueUseCase.repor(id, quantidade);
+        reporEstoqueUseCase.executar(id, quantidade);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/estoque/reduzir")
     public ResponseEntity<Void> reduzirEstoque(@PathVariable UUID id, @RequestParam Integer quantidade) {
-        atualizarEstoqueUseCase.reduzir(id, quantidade);
+        reduzirEstoqueUseCase.executar(id, quantidade);
         return ResponseEntity.noContent().build();
     }
 }

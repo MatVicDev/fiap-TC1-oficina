@@ -11,18 +11,18 @@ public class Placa {
     protected Placa() {}
 
     public Placa(String numero) {
-        if (!isValid(numero)) {
+        if (!validar(numero)) {
             throw new IllegalArgumentException(
                     "Placa inválida. Use o padrão AAA0000 ou ABC1D23.");
         }
         this.numero = numero.toUpperCase().replaceAll("[^A-Z0-9]", "");
     }
 
-    private boolean isValid(String numero) {
+    private boolean validar(String numero) {
         if (numero == null) return false;
-        String sanitized = numero.toUpperCase().replaceAll("[^A-Z0-9]", "");
-        boolean antigoValido = sanitized.matches("[A-Z]{3}[0-9]{4}");
-        boolean mercosulValido = sanitized.matches("[A-Z]{3}[0-9][A-Z][0-9]{2}");
+        String numeroSaneado = numero.toUpperCase().replaceAll("[^A-Z0-9]", "");
+        boolean antigoValido = numeroSaneado.matches("[A-Z]{3}[0-9]{4}");
+        boolean mercosulValido = numeroSaneado.matches("[A-Z]{3}[0-9][A-Z][0-9]{2}");
 
         return antigoValido || mercosulValido;
     }

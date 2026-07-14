@@ -13,7 +13,7 @@ public class ListarClientesUseCase {
     private final ClienteRepository repository;
 
     public List<ClienteResponse> executar() {
-        return repository.listarClientes().stream()
+        return repository.listarTodos().stream()
                 .map(ClienteMapper::toResponse)
                 .toList();
     }

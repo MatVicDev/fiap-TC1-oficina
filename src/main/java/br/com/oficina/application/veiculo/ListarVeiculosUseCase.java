@@ -13,7 +13,7 @@ public class ListarVeiculosUseCase {
     private final VeiculoRepository repository;
 
     public List<VeiculoResponse> executar() {
-        return repository.listarVeiculos().stream()
+        return repository.listarTodos().stream()
                 .map(VeiculoMapper::toResponse)
                 .toList();
     }

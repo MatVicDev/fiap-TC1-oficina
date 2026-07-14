@@ -14,8 +14,8 @@ import java.util.UUID;
 public interface OrdemServicoRepositoryJpa extends JpaRepository<OrdemServico, UUID>, OrdemServicoRepository {
 
     @Override
-    default OrdemServico salvar(OrdemServico novaOS) {
-        return save(novaOS);
+    default OrdemServico salvar(OrdemServico ordemServico) {
+        return save(ordemServico);
     }
 
     @Override
@@ -24,12 +24,12 @@ public interface OrdemServicoRepositoryJpa extends JpaRepository<OrdemServico, U
     }
 
     @Override
-    default List<OrdemServico> listarOrdemServicos() {
+    default List<OrdemServico> listarTodos() {
         return findAll();
     }
 
     @Override
-    default List<OrdemServico> listarOrdemServicoPorStatus(StatusOS status) {
+    default List<OrdemServico> listarOrdemServicosPorStatus(StatusOS status) {
         return findByStatus(status);
     }
 

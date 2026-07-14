@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AdicionarItemOSUseCase {
+public class AdicionarItemOrdemServicoUseCase {
     private final OrdemServicoRepository osRepository;
     private final InsumoRepository insumoRepository;
     private final EstoqueRepository estoqueRepository;
@@ -38,7 +38,7 @@ public class AdicionarItemOSUseCase {
         estoqueRepository.salvar(estoque);
 
         ItemOS item = new ItemOS(insumoId, insumo.getNome(), insumo.getPrecoBase(), quantidade, os);
-        os.adicionarItemOs(item);
+        os.adicionarItemOS(item);
 
         osRepository.salvar(os);
 

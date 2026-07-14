@@ -34,18 +34,18 @@ class ListarServicosUseCaseTest {
                 new Servico("Troca de Óleo", "Descrição qualquer", new BigDecimal("80.00"), 60),
                 new Servico("Alinhamento", "Descrição qualquer", new BigDecimal("120.00"), 90));
 
-        when(repository.buscarTodos()).thenReturn(servicos);
+        when(repository.listarTodos()).thenReturn(servicos);
 
         List<ServicoResponse> response = useCase.executar();
 
         assertEquals(2, response.size());
-        verify(repository, times(1)).buscarTodos();
+        verify(repository, times(1)).listarTodos();
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não há serviços")
     void deveRetornarListaVaziaQuandoNaoHaServicos() {
-        when(repository.buscarTodos()).thenReturn(List.of());
+        when(repository.listarTodos()).thenReturn(List.of());
 
         List<ServicoResponse> response = useCase.executar();
 

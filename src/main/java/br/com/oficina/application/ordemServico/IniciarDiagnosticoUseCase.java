@@ -14,6 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class IniciarDiagnosticoUseCase {
     private final OrdemServicoRepository repository;
+    private final NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
 
     @Transactional
     public OrdemServicoResponse executar(UUID id) {
@@ -23,6 +24,7 @@ public class IniciarDiagnosticoUseCase {
         os.iniciarDiagnostico();
 
         repository.salvar(os);
+        notificarStatusOrdemServicoService.notificarMudancaStatus(os);
 
         return OrdemServicoMapper.toResponse(os);
     }

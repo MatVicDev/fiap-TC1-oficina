@@ -27,6 +27,9 @@ class RejeitarOrcamentoUseCaseTest {
     @Mock
     private OrdemServicoRepository repository;
 
+    @Mock
+    private NotificarStatusOrdemServicoService notificarStatusOrdemServicoService;
+
     @InjectMocks
     private RejeitarOrcamentoUseCase useCase;
 

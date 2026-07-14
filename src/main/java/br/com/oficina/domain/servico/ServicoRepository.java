@@ -10,7 +10,7 @@ public interface ServicoRepository {
 
     Optional<Servico> buscarPorId(UUID id);
 
-    List<Servico> buscarTodos();
+    List<Servico> listarTodos();
 
     void excluir(UUID id);
 }

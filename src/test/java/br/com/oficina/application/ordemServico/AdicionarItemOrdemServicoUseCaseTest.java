@@ -24,8 +24,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes do AdicionarItemOSUseCase")
-class AdicionarItemOSUseCaseTest {
+@DisplayName("Testes do AdicionarItemOrdemServicoUseCase")
+class AdicionarItemOrdemServicoUseCaseTest {
 
     @Mock
     private OrdemServicoRepository osRepository;
@@ -37,7 +37,7 @@ class AdicionarItemOSUseCaseTest {
     private EstoqueRepository estoqueRepository;
 
     @InjectMocks
-    private AdicionarItemOSUseCase useCase;
+    private AdicionarItemOrdemServicoUseCase useCase;
 
     @Test
     @DisplayName("Deve adicionar item à OS com sucesso")

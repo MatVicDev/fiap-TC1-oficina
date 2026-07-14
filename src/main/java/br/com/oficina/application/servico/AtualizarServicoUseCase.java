@@ -22,7 +22,7 @@ public class AtualizarServicoUseCase {
         servico.atualizar(
                 request.nome(),
                 request.descricao(),
-                request.valor(),
+                request.precoBase(),
                 request.tempoPrevisto());
 
         repository.salvar(servico);

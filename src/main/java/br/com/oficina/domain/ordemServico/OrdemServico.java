@@ -90,7 +90,7 @@ public class OrdemServico {
         }
     }
 
-    public void adicionarItemOs(ItemOS item) {
+    public void adicionarItemOS(ItemOS item) {
         if (this.status != StatusOS.RECEBIDA && this.status != StatusOS.EM_DIAGNOSTICO) {
             throw new DomainException("Não é possível adicionar itens com a OS em estado de " + status);
         }

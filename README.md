@@ -1,6 +1,6 @@
 # 🚗 Oficina Mecânica — Sistema de Gestão
 
-> Back-end do sistema de gestão de uma oficina mecânica, desenvolvido como Tech Challenge da Fase 1 do programa **SOAT — Software Architecture** da FIAP.
+> Back-end do sistema de gestão de uma oficina mecânica, desenvolvido como Tech Challenge da Fase 2 do programa **SOAT — Software Architecture** da FIAP (evolução da Fase 1: Clean Architecture, containerização, Kubernetes, Terraform e CI/CD).
 
 ---
 
@@ -40,7 +40,50 @@ O **PostgreSQL** foi escolhido por ser um banco relacional robusto, open-source 
 
 ## 🏗 Arquitetura
 
-O projeto segue **arquitetura em camadas** com princípios de **DDD (Domain-Driven Design)**:
+O projeto segue **arquitetura em camadas** (Clean Architecture / Hexagonal) com princípios de **DDD (Domain-Driven Design)**. A regra de dependência aponta sempre para dentro: `api` depende de `application`, que depende de `domain`; `infrastructure` implementa as interfaces (portas) definidas no `domain`, e nunca o contrário.
+
+```mermaid
+flowchart TB
+    Client["Cliente HTTP<br/>(Postman / Swagger UI)"]
+    ExtSystem["Sistema externo<br/>de orçamento"]
+    Security["JWT / Spring Security"]
+    OpenApi["OpenApiConfig (Swagger)"]
+
+    subgraph API["api — Controllers REST + DTOs"]
+        Controllers["AuthController · ClienteController<br/>VeiculoController · ServicoController<br/>InsumoController · OrdemServicoController<br/>WebhookOrcamentoController"]
+    end
+
+    subgraph APPLICATION["application — Casos de uso"]
+        UseCases["CadastrarCliente · CriarOrdemServico<br/>AprovarOrcamento · ReporEstoque · ..."]
+    end
+
+    subgraph DOMAIN["domain — Regras de negócio puras (sem dependências externas)"]
+        Entities["Entidades e Value Objects<br/>Cliente, Veiculo, OrdemServico,<br/>Insumo, Servico, Estoque, Cpf, Placa"]
+        Ports["Portas (interfaces)<br/>*Repository · NotificacaoService"]
+    end
+
+    subgraph INFRA["infrastructure — Adaptadores de saída"]
+        JpaAdapter["Repositórios JPA"]
+        EmailAdapter["EmailNotificacaoAdapter"]
+    end
+
+    Postgres[("PostgreSQL")]
+    Smtp[("MailHog / SMTP")]
+
+    Client --> Controllers
+    ExtSystem --> Controllers
+    Security -.protege.-> Controllers
+    OpenApi -.documenta.-> Controllers
+
+    Controllers --> UseCases
+    UseCases --> Entities
+    UseCases --> Ports
+
+    Ports -.implementada por.-> JpaAdapter
+    Ports -.implementada por.-> EmailAdapter
+    JpaAdapter --> Postgres
+    EmailAdapter --> Smtp
+```
 
 ```
 src/main/java/br/com/oficina/
@@ -49,7 +92,10 @@ src/main/java/br/com/oficina/
 │   ├── veiculo/         # Entidade Veiculo + Value Object Placa
 │   ├── ordemServico/    # Aggregate Root OrdemServico + ItemOS + Orcamento
 │   ├── insumo/          # Entidade Insumo
-│   └── estoque/         # Entidade Estoque
+│   ├── estoque/         # Entidade Estoque
+│   ├── servico/         # Entidade Servico
+│   ├── notificacao/     # Porta NotificacaoService
+│   └── exception/       # Exceções de domínio
 │
 ├── application/         # Casos de uso — orquestra o domínio
 │   ├── cliente/
@@ -58,11 +104,14 @@ src/main/java/br/com/oficina/
 │   ├── insumo/
 │   └── servico/
 │
-├── infrastructure/      # Detalhes técnicos — JPA, segurança
-│   ├── persistence/
-│   └── security/
+├── infrastructure/      # Detalhes técnicos — adaptadores de saída
+│   ├── persistence/     # Repositórios JPA (implementam as portas do domain)
+│   ├── security/        # JWT, Spring Security
+│   ├── notificacao/     # EmailNotificacaoAdapter (implementa NotificacaoService)
+│   └── openapi/         # Configuração do Swagger (SecurityScheme JWT)
 │
 └── api/                 # Controllers REST + DTOs
+    ├── auth/
     ├── cliente/
     ├── veiculo/
     ├── ordemServico/
@@ -78,6 +127,56 @@ src/main/java/br/com/oficina/
 | **Diagnóstico** | Diagnóstico, verificação de estoque e orçamento |
 | **Execução** | Aprovação do orçamento e execução do serviço |
 | **Entrega** | Finalização, notificação e entrega do veículo |
+
+### Infraestrutura provisionada e fluxo de deploy
+
+```mermaid
+flowchart TB
+    Dev["Desenvolvedor"]
+
+    subgraph LOCAL["Ambiente local"]
+        Compose["docker-compose.yml"]
+        ComposeStack["app + PostgreSQL + MailHog<br/>(containers Docker)"]
+        Compose --> ComposeStack
+    end
+
+    subgraph CICD["CI/CD — GitHub Actions (.github/workflows/ci-cd.yml)"]
+        Test["job: test<br/>mvnw verify + Postgres de serviço<br/>gate JaCoCo ≥ 80%"]
+        Build["job: build-and-push<br/>docker build → push GHCR"]
+        Smoke["job: deploy-smoke-test<br/>cluster kind efêmero no runner"]
+        Test --> Build
+        Test --> Smoke
+    end
+
+    subgraph IAC["IaC — Terraform (/infra, provider kind)"]
+        TFCluster["terraform apply<br/>-target=kind_cluster.oficina"]
+        TFManifests["terraform apply<br/>(null_resource → kubectl apply -f /k8s)"]
+        TFCluster --> TFManifests
+    end
+
+    subgraph K8S["Kubernetes — namespace oficina (/k8s)"]
+        CM["ConfigMap + Secret<br/>(01, 02)"]
+        PG["Postgres<br/>Deployment + PVC + Service (03)"]
+        MH["MailHog<br/>Deployment + Service (04)"]
+        APP["oficina-app<br/>Deployment (2 réplicas) + Service NodePort (05)"]
+        HPA["HPA<br/>2–5 réplicas, 70% CPU (06)"]
+        APP -.escalado por.-> HPA
+        APP --> PG
+        APP --> MH
+        CM -.config/segredos.-> APP
+    end
+
+    Dev -- git push --> CICD
+    Dev -.uso diário.-> LOCAL
+    Smoke --> TFCluster
+    TFManifests --> CM
+    TFManifests --> PG
+    TFManifests --> MH
+    TFManifests --> APP
+    TFManifests --> HPA
+```
+
+O mesmo Terraform de `/infra` roda tanto localmente (seção [Deploy em Kubernetes](#☸️-deploy-em-kubernetes) abaixo) quanto dentro do job `deploy-smoke-test` do CI/CD: cria o cluster kind, carrega a imagem e aplica os manifestos de `/k8s`; a diferença é que no CI o cluster é destruído ao final (`terraform destroy`), servindo como teste de fumaça do provisionamento a cada push.
 
 ---
 
@@ -99,14 +198,10 @@ cd fiap-TC1-oficina
 
 **2. Configure as variáveis de ambiente**
 
-Crie um arquivo `.env` na raiz do projeto com base no exemplo abaixo:
+Copie o arquivo de exemplo e ajuste os valores conforme necessário:
 
-```env
-DATABASE_USER=postgres
-DATABASE_PASSWORD=postgres
-DATABASE_NAME=oficina
-JWT_SECRET=sua-chave-secreta-de-pelo-menos-32-caracteres
-JWT_EXPIRATION=86400000
+```bash
+cp .env.example .env
 ```
 
 **3. Suba o ambiente completo**
@@ -117,6 +212,7 @@ docker-compose up --build
 
 Este comando irá:
 - Baixar e iniciar o container do **PostgreSQL 16**
+- Baixar e iniciar o container do **MailHog** (SMTP de teste, UI em http://localhost:8025)
 - Compilar e iniciar o container da **aplicação Spring Boot**
 - Criar automaticamente todas as tabelas via Hibernate
 
@@ -127,12 +223,57 @@ Este comando irá:
 | API | http://localhost:8080                       |
 | Swagger UI | http://localhost:8080/swagger-ui/index.html |
 | API Docs (JSON) | http://localhost:8080/v3/api-docs           |
+| MailHog (e-mails de teste) | http://localhost:8025          |
+
+---
+
+## ☸️ Deploy em Kubernetes
+
+Os manifestos ficam em `/k8s`, com prefixo numérico para garantir a ordem de aplicação (namespace → config → segredos → banco → mailhog → app → HPA):
+
+```
+k8s/
+├── 00-namespace.yaml    # namespace "oficina"
+├── 01-configmap.yaml    # config não sensível (URL do banco, host/porta do SMTP, etc.)
+├── 02-secret.yaml       # credenciais do banco e chave JWT (valores placeholder — troque antes de usar fora do seu ambiente local)
+├── 03-postgres.yaml     # PersistentVolumeClaim + Deployment + Service do Postgres
+├── 04-mailhog.yaml      # Deployment + Service do MailHog
+├── 05-app.yaml          # Deployment + Service da aplicação
+└── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
+```
+
+### Pré-requisitos
+
+- `docker`, `kind`, `kubectl` e `terraform` (>= 1.5) instalados.
+- A imagem `oficina-app:latest` já construída (`docker build -t oficina-app:latest .` na raiz do projeto).
+- O **metrics-server** instalado no cluster — sem ele, o HPA não consegue ler métricas de CPU e não escala (kind não vem com ele por padrão).
+
+### Aplicar
+
+O cluster **kind** e os manifestos de `/k8s` são provisionados pelo Terraform em `/infra`:
+
+```bash
+docker build -t oficina-app:latest .
+cd infra
+terraform init
+terraform apply -target=kind_cluster.oficina   # só o cluster
+kind load docker-image oficina-app:latest --name oficina
+terraform apply                                # aplica os manifestos de /k8s
+```
+
+O primeiro `apply` cria só o cluster kind (com as portas 8080 e 8025 já mapeadas para o host), para dar tempo de carregar a imagem antes de qualquer pod ser agendado — se os manifestos forem aplicados antes da imagem existir no cluster, os pods da app entram em `ImagePullBackOff`. O segundo `apply` aplica os manifestos de `/k8s`; rodar de novo reaplica caso algum arquivo em `/k8s` mude.
+
+Para destruir o cluster: `terraform destroy` dentro de `/infra`.
+
+### Acessar
+
+Como a app e o MailHog usam `Service` do tipo `NodePort`, com o mapeamento de portas feito pelo Terraform a API fica em `http://localhost:8080` e a UI do MailHog em `http://localhost:8025`, exatamente como no `docker-compose`. Sem esse mapeamento, use `kubectl port-forward service/oficina-app 8080:8080 -n oficina`.
 
 ---
 
 ## 🔐 Autenticação
 
-As APIs administrativas são protegidas por **JWT**. Para acessar os endpoints protegidos:
+As APIs administrativas são protegidas por **JWT**. O usuário e a senha do admin vêm das variáveis de ambiente `ADMIN_USERNAME`/`ADMIN_PASSWORD` (não ficam mais fixas no código-fonte). Com os valores padrão do `.env.example`, o login é:
 
 **1. Faça login**
 
@@ -141,8 +282,8 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin123"
+  "usuario": "admin",
+  "senha": "troque-esta-senha-antes-de-usar-em-producao"
 }
 ```
 
@@ -153,6 +294,8 @@ Authorization: Bearer <seu_token_aqui>
 ```
 
 > ⚠️ O token expira em 24 horas (configurável via `JWT_EXPIRATION`).
+
+**Testando pelo Swagger UI**: após o login, clique em **Authorize** (canto superior direito de `/swagger-ui/index.html`), cole o token e todos os endpoints protegidos ficam testáveis via "Try it out". Login (`/auth/login`) e o webhook de orçamento são públicos e não exigem esse passo.
 
 ---
 
@@ -198,6 +341,11 @@ Authorization: Bearer <seu_token_aqui>
 | PATCH | `/ordens-servico/{id}/entrega` | Registrar entrega | ✅ |
 | POST | `/ordens-servico/{id}/itens` | Adicionar item à OS | ✅ |
 
+### Webhook
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| POST | `/webhooks/ordens-servico/{id}/orcamento` | Receber decisão de orçamento de sistema externo | ❌ |
+
 ### Insumos e Estoque
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
@@ -240,13 +388,13 @@ ENTREGUE
 
 ## 🧪 Testes
 
-O projeto possui **106 testes unitários** com **91% de cobertura** nos domínios críticos (`domain` + `application`), superando com folga o mínimo exigido de 80%.
+O projeto possui **115 testes automatizados** (114 testes unitários + 1 teste de contexto Spring) com **90% de cobertura de linha** nos domínios críticos (`domain` + `application`), superando com folga o mínimo exigido de 80%.
 
 | Métrica | Resultado |
 |---|---|
-| Total de testes | 106 |
-| Testes passando | 106 ✅ |
-| Cobertura (domain + application) | **91%** |
+| Total de testes | 115 |
+| Testes passando | 115 ✅ |
+| Cobertura de linha (domain + application) | **90%** |
 | Meta exigida | 80% |
 | Ferramenta | JaCoCo 0.8.11 |
 
@@ -269,7 +417,7 @@ O projeto possui **106 testes unitários** com **91% de cobertura** nos domínio
 
 ```
 src/test/java/br/com/oficina/
-├── domain/
+├── domain/                     # 9 arquivos — 42 testes — regras de negócio puras
 │   ├── OrdemServicoTest.java      # 9 testes — transições de status
 │   ├── CpfTest.java               # 6 testes — validação CPF/CNPJ
 │   ├── PlacaTest.java             # 5 testes — validação de placa
@@ -279,11 +427,15 @@ src/test/java/br/com/oficina/
 │   ├── InsumoTest.java            # 3 testes — entidade insumo
 │   ├── OrcamentoTest.java         # 3 testes — entidade orçamento
 │   └── ItemOSTest.java            # 3 testes — item de OS
-└── application/
-    ├── CadastrarClienteUseCaseTest.java
-    ├── CriarOSUseCaseTest.java
-    ├── AprovarOrcamentoUseCaseTest.java
-    └── ... (30+ arquivos de teste)
+├── application/                # 32 arquivos — 70 testes — casos de uso
+│   ├── cliente/                    # 5 arquivos — 11 testes
+│   ├── veiculo/                    # 4 arquivos — 9 testes
+│   ├── servico/                    # 5 arquivos — 10 testes
+│   ├── insumo/                     # 7 arquivos — 14 testes (inclui repor/reduzir estoque)
+│   └── ordemServico/               # 11 arquivos — 26 testes (fluxo completo da OS + notificação)
+├── infrastructure/notificacao/
+│   └── EmailNotificacaoAdapterTest.java   # 2 testes — envio de e-mail e falha de SMTP
+└── OficinaApplicationTests.java   # 1 teste — carregamento do contexto Spring
 ```
 
 ---
@@ -301,7 +453,7 @@ src/test/java/br/com/oficina/
 
 ### Análise de vulnerabilidades
 
-Foi realizado scan de segurança utilizando **Trivy v0.70** nas dependências do projeto. O relatório completo está disponível em [`trivy-report.txt`](./trivy-report.txt) e a análise detalhada em [`relatorio_vulnerabilidades.pdf`](../../../../Downloads/relatorio_vulnerabilidades.pdf).
+Foi realizado scan de segurança utilizando **Trivy v0.70** nas dependências do projeto. O relatório completo está disponível em [`trivy-report.txt`](./trivy-report.txt) e a análise detalhada em [`relatorio_vulnerabilidades.pdf`](./relatorio_vulnerabilidades.pdf).
 
 **Resumo:**
 - 0 vulnerabilidades CRITICAL
@@ -331,8 +483,12 @@ fiap-TC1-oficina/
 ├── src/
 │   ├── main/java/br/com/oficina/
 │   └── test/java/br/com/oficina/
-├── dockerfile
+├── k8s/                        # Manifestos Kubernetes (Deployments, Services, ConfigMap, Secret, HPA)
+├── infra/                      # Terraform: provisiona o cluster kind e aplica os manifestos de /k8s
+├── Dockerfile
 ├── docker-compose.yml
+├── .dockerignore
+├── .env.example
 ├── pom.xml
 ├── trivy-report.txt
 ├── relatorio_vulnerabilidades.pdf
