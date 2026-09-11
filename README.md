@@ -1,6 +1,28 @@
 # 🚗 Oficina Mecânica — Sistema de Gestão
 
-> Back-end do sistema de gestão de uma oficina mecânica, desenvolvido como Tech Challenge da Fase 2 do programa **SOAT — Software Architecture** da FIAP (evolução da Fase 1: Clean Architecture, containerização, Kubernetes, Terraform e CI/CD).
+> Back-end do sistema de gestão de uma oficina mecânica. Este repositório é a **aplicação principal** do Tech Challenge Fase 3 do programa **SOAT — Software Architecture** da FIAP (evolução da Fase 2: Clean Architecture, containerização, Kubernetes e CI/CD; a Fase 3 adiciona nuvem real, autenticação serverless por CPF, banco gerenciado e observabilidade).
+
+---
+
+## ☁️ Tech Challenge Fase 3 — visão geral
+
+A Fase 3 divide o sistema em **4 repositórios**:
+
+| # | Repositório | Conteúdo |
+|---|---|---|
+| 1 | [`fiap-tc3-lambda-auth`](https://github.com/MatVicDev/fiap-tc3-lambda-auth) | Function Serverless (AWS Lambda) de autenticação por CPF + API Gateway |
+| 2 | [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) | Terraform do cluster EKS, rede, autoscaling, Load Balancer Controller e Datadog Agent |
+| 3 | [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) | Terraform do RDS PostgreSQL gerenciado |
+| 4 | **`fiap-TC1-oficina` (este repositório)** | Aplicação Spring Boot + manifests Kubernetes |
+
+Documentação de arquitetura completa (diagramas, RFCs, ADRs, modelo ER) em [`/docs`](./docs):
+
+- [Diagrama de Componentes](./docs/diagrama-componentes.md) · [Diagrama de Sequência](./docs/diagrama-sequencia.md)
+- [RFC-001 Escolha do banco](./docs/RFC-001-escolha-banco-de-dados.md) · [RFC-002 Estratégia de autenticação CPF](./docs/RFC-002-estrategia-autenticacao-cpf.md) · [RFC-003 Escolha da nuvem](./docs/RFC-003-escolha-da-nuvem.md)
+- [ADR-001 Padrão de comunicação](./docs/ADR-001-padrao-comunicacao.md) · [ADR-002 Escalabilidade](./docs/ADR-002-escalabilidade-hpa-node-autoscaling.md) · [ADR-003 Gateway só para Lambda](./docs/ADR-003-gateway-somente-para-lambda.md) · [ADR-004 RDS master user compartilhado](./docs/ADR-004-rds-master-user-compartilhado.md) · [ADR-005 FK lógica entre agregados](./docs/ADR-005-fk-logica-entre-agregados.md)
+- [Diagrama ER](./docs/ER-diagrama.md)
+
+> **Status do deploy real:** a conta AWS do desafio está pendente de liberação de crédito pela FIAP. Todo o Terraform, pipelines de CI/CD e código estão prontos e validados (compilação, testes, `terraform validate`); o `terraform apply`/deploy efetivo em nuvem fica para quando a conta existir — ver seção de CI/CD de cada repositório.
 
 ---
 
@@ -31,6 +53,8 @@ Uma oficina mecânica de médio porte precisava substituir seus processos manuai
 | JWT (jjwt) | 0.12.5 | Autenticação |
 | JaCoCo | 0.8.11 | Cobertura de testes |
 | Trivy | 0.70 | Análise de vulnerabilidades |
+| Datadog (dd-java-agent + Agent) | APM, métricas de K8s, logs, dashboards |
+| logstash-logback-encoder | 8.0 | Logs estruturados em JSON |
 
 ### Justificativa do banco de dados
 
@@ -229,18 +253,23 @@ Este comando irá:
 
 ## ☸️ Deploy em Kubernetes
 
-Os manifestos ficam em `/k8s`, com prefixo numérico para garantir a ordem de aplicação (namespace → config → segredos → banco → mailhog → app → HPA):
+> Desde a Fase 3, o Postgres **não roda mais dentro do cluster** — o banco é o RDS gerenciado provisionado por [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db). Localmente (`docker-compose`/`kind`), nada muda: continua subindo um Postgres em container para desenvolvimento.
+
+Os manifestos ficam em `/k8s`, com prefixo numérico para garantir a ordem de aplicação (namespace → config → segredos → mailhog → app → HPA):
 
 ```
 k8s/
 ├── 00-namespace.yaml    # namespace "oficina"
-├── 01-configmap.yaml    # config não sensível (URL do banco, host/porta do SMTP, etc.)
+├── 01-configmap.yaml    # config não sensível (URL do banco — RDS em nuvem, tags do Datadog, etc.)
 ├── 02-secret.yaml       # credenciais do banco e chave JWT (valores placeholder — troque antes de usar fora do seu ambiente local)
-├── 03-postgres.yaml     # PersistentVolumeClaim + Deployment + Service do Postgres
-├── 04-mailhog.yaml      # Deployment + Service do MailHog
-├── 05-app.yaml          # Deployment + Service da aplicação
+├── 04-mailhog.yaml      # Deployment + Service do MailHog (só para o smoke test local/CI)
+├── 05-app.yaml          # Deployment + Service da aplicação (annotations do Datadog + DD_AGENT_HOST)
 └── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
 ```
+
+Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster e publica `SPRING_DATASOURCE_URL`/segredos necessários), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db), e então `kubectl apply -f k8s/` apontando o `SPRING_DATASOURCE_URL` do ConfigMap para o endpoint do RDS. O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza esse último passo quando a variável `DEPLOY_TO_AWS=true` está configurada.
+
+A seguir, o fluxo **local/kind** usado no dia a dia de desenvolvimento e no smoke test do CI (não usa RDS nem EKS):
 
 ### Pré-requisitos
 
@@ -273,9 +302,16 @@ Como a app e o MailHog usam `Service` do tipo `NodePort`, com o mapeamento de po
 
 ## 🔐 Autenticação
 
-As APIs administrativas são protegidas por **JWT**. O usuário e a senha do admin vêm das variáveis de ambiente `ADMIN_USERNAME`/`ADMIN_PASSWORD` (não ficam mais fixas no código-fonte). Com os valores padrão do `.env.example`, o login é:
+As rotas protegidas exigem **JWT**, emitido por dois caminhos diferentes conforme o claim `role`:
 
-**1. Faça login**
+| Quem | Como loga | `role` do token | Onde é emitido |
+|---|---|---|---|
+| Administrador da oficina | Usuário/senha | `ADMIN` | `POST /auth/login`, neste repositório |
+| Cliente final | CPF | `CLIENTE` | Function Serverless do repositório [`fiap-tc3-lambda-auth`](https://github.com/MatVicDev/fiap-tc3-lambda-auth) |
+
+Os dois tipos de token são assinados com o **mesmo segredo** (`JWT_SECRET`, compartilhado via Secrets Manager em nuvem) e validados pelo mesmo `JWTFilter` — ver [RFC-002](./docs/RFC-002-estrategia-autenticacao-cpf.md) para a justificativa completa dessa decisão.
+
+**1. Login administrativo (usuário/senha, direto nesta aplicação)**
 
 ```http
 POST /auth/login
@@ -287,13 +323,22 @@ Content-Type: application/json
 }
 ```
 
-**2. Use o token retornado no header das requisições**
+**2. Login do cliente final (CPF, via API Gateway + Lambda de outro repositório)**
+
+```http
+POST https://<api-gateway-url>/auth/cpf
+Content-Type: application/json
+
+{ "cpf": "123.456.789-09" }
+```
+
+**3. Use o token retornado (de qualquer um dos dois logins) no header das requisições a esta aplicação**
 
 ```http
 Authorization: Bearer <seu_token_aqui>
 ```
 
-> ⚠️ O token expira em 24 horas (configurável via `JWT_EXPIRATION`).
+> ⚠️ O token expira em 24 horas (configurável via `JWT_EXPIRATION`, deve bater com `jwt_expiration_ms` da Lambda).
 
 **Testando pelo Swagger UI**: após o login, clique em **Authorize** (canto superior direito de `/swagger-ui/index.html`), cole o token e todos os endpoints protegidos ficam testáveis via "Try it out". Login (`/auth/login`) e o webhook de orçamento são públicos e não exigem esse passo.
 
@@ -444,12 +489,18 @@ src/test/java/br/com/oficina/
 
 ### Medidas implementadas
 
-- **Autenticação JWT** em todos os endpoints administrativos
+- **Autenticação JWT** em todos os endpoints protegidos (admin via usuário/senha, cliente final via CPF — ver seção [Autenticação](#-autenticação))
 - **Validação de CPF/CNPJ** com algoritmo de dígitos verificadores
 - **Validação de placa** com suporte ao padrão Mercosul e antigo
-- **Variáveis de ambiente** para todas as credenciais sensíveis
+- **Variáveis de ambiente / Secrets Manager** para todas as credenciais sensíveis — nunca hardcoded
 - **CSRF desabilitado** para APIs stateless (padrão REST)
 - **Sessões stateless** via `SessionCreationPolicy.STATELESS`
+
+### Observabilidade
+
+- **Datadog APM**: `dd-java-agent` embarcado na imagem (`Dockerfile`), ativado via `JAVA_TOOL_OPTIONS`; envia traces para o Datadog Agent (DaemonSet provisionado em [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s)).
+- **Logs estruturados em JSON** (`src/main/resources/logback-spring.xml`, via `logstash-logback-encoder`), com `correlationId` incluído em todo log da requisição (`CorrelationIdFilter`, header `X-Correlation-Id` aceito de entrada ou gerado).
+- **Métricas de CPU/memória do Kubernetes, healthchecks e dashboards**: coletados pelo Datadog Agent — detalhamento do provisionamento em [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s).
 
 ### Análise de vulnerabilidades
 
@@ -483,8 +534,9 @@ fiap-TC1-oficina/
 ├── src/
 │   ├── main/java/br/com/oficina/
 │   └── test/java/br/com/oficina/
+├── docs/                       # RFCs, ADRs, diagramas de componentes/sequência, modelo ER (Fase 3)
 ├── k8s/                        # Manifestos Kubernetes (Deployments, Services, ConfigMap, Secret, HPA)
-├── infra/                      # Terraform: provisiona o cluster kind e aplica os manifestos de /k8s
+├── infra/                      # Terraform: provisiona o cluster kind local e aplica os manifestos de /k8s (dev/CI)
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .dockerignore
