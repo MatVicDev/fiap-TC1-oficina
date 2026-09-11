@@ -26,6 +26,10 @@ public class Cliente {
     @Column(length = 50)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private StatusCliente status;
+
     private LocalDateTime dataCadastro;
 
     public Cliente(String nome, String cpfRaw, String telefone, String email) {
@@ -35,7 +39,20 @@ public class Cliente {
         this.cpf = new Cpf(cpfRaw);
         this.telefone = telefone;
         this.email = email;
+        this.status = StatusCliente.ATIVO;
         this.dataCadastro = LocalDateTime.now();
+    }
+
+    public void ativar() {
+        this.status = StatusCliente.ATIVO;
+    }
+
+    public void inativar() {
+        this.status = StatusCliente.INATIVO;
+    }
+
+    public boolean isAtivo() {
+        return this.status == StatusCliente.ATIVO;
     }
 
     private void validarNome(String nome) {
@@ -80,5 +97,9 @@ public class Cliente {
 
     public LocalDateTime getDataCadastro() {
         return dataCadastro;
+    }
+
+    public StatusCliente getStatus() {
+        return status;
     }
 }
