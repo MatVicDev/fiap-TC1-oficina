@@ -7,7 +7,9 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "estoques")
+@Table(name = "estoques", indexes = {
+        @Index(name = "idx_estoques_insumo_id", columnList = "insumoId", unique = true)
+})
 public class Estoque {
 
     @Id
