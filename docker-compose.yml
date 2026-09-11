@@ -43,6 +43,9 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_MAIL_HOST: mailhog
       SPRING_MAIL_PORT: 1025
+      # Sem Datadog Agent local, o tracer descartaria os spans silenciosamente;
+      # desligar evita overhead e ruído nos logs de dev.
+      DD_TRACE_ENABLED: "false"
     depends_on:
       postgres:
         condition: service_healthy

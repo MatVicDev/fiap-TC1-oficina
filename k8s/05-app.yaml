@@ -12,6 +12,11 @@ spec:
     metadata:
       labels:
         app: oficina-app
+        tags.datadoghq.com/env: "production"
+        tags.datadoghq.com/service: "oficina-app"
+        tags.datadoghq.com/version: "1.0.0"
+      annotations:
+        admission.datadoghq.com/java-lib.version: "latest"
     spec:
       containers:
         - name: oficina-app
@@ -24,6 +29,11 @@ spec:
                 name: oficina-config
             - secretRef:
                 name: oficina-secret
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           readinessProbe:
             httpGet:
               path: /v3/api-docs

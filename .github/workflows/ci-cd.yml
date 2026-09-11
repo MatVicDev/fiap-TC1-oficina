@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [main, TC2-refatoracao]
+    branches: [main, homologacao]
   pull_request:
-    branches: [main, TC2-refatoracao]
+    branches: [main, homologacao]
   workflow_dispatch:
 
 permissions:
@@ -131,3 +131,33 @@ jobs:
         if: always()
         working-directory: infra
         run: terraform destroy -auto-approve
+
+  deploy-eks:
+    needs: build-and-push
+    if: github.event_name == 'push' && vars.DEPLOY_TO_AWS == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'producao' || 'homologacao' }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Definir nome da imagem
+        run: echo "IMAGE_NAME=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/oficina-app" >> "$GITHUB_ENV"
+
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Atualizar kubeconfig do cluster EKS
+        run: aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
+
+      # O EKS puxa a mesma imagem publicada no GHCR pelo job build-and-push — evita
+      # duplicar registry (ECR) só para satisfazer o requisito de deploy em nuvem.
+      - name: Atualizar imagem do deployment
+        run: |
+          kubectl set image deployment/oficina-app oficina-app=${{ env.IMAGE_NAME }}:${{ github.sha }} -n oficina
+          kubectl rollout status deployment/oficina-app -n oficina --timeout=180s
