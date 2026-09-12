@@ -267,7 +267,9 @@ k8s/
 └── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
 ```
 
-Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster e publica `SPRING_DATASOURCE_URL`/segredos necessários), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db), e então `kubectl apply -f k8s/` apontando o `SPRING_DATASOURCE_URL` do ConfigMap para o endpoint do RDS. O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza esse último passo quando a variável `DEPLOY_TO_AWS=true` está configurada.
+Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) (cria o RDS e publica `rds-endpoint`/`rds-secret-arn` no SSM Parameter Store). O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza o resto: lê esses valores do SSM/Secrets Manager, atualiza o `SPRING_DATASOURCE_URL` do ConfigMap e as credenciais do Secret, e só então atualiza a imagem do Deployment — tudo isso quando a variável `DEPLOY_TO_AWS=true` está configurada.
+
+Segredos/variáveis necessários no GitHub para habilitar o job `deploy-eks`: secret `AWS_ROLE_ARN` (OIDC, sem chaves estáticas) e variáveis `AWS_REGION`, `EKS_CLUSTER_NAME`. A role assumida via OIDC também precisa de permissão para `ssm:GetParameter` em `/fiap-tc3/*` e `secretsmanager:GetSecretValue` no secret gerenciado do RDS, além do acesso ao cluster EKS (`eks:DescribeCluster` + entrada no `aws-auth`/access entries).
 
 A seguir, o fluxo **local/kind** usado no dia a dia de desenvolvimento e no smoke test do CI (não usa RDS nem EKS):
 

@@ -137,6 +137,8 @@ jobs:
     if: github.event_name == 'push' && vars.DEPLOY_TO_AWS == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'producao' || 'homologacao' }}
+    env:
+      AMBIENTE: ${{ github.ref_name == 'main' && 'producao' || 'homologacao' }}
     permissions:
       contents: read
       id-token: write
@@ -155,8 +157,31 @@ jobs:
       - name: Atualizar kubeconfig do cluster EKS
         run: aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
+      # rds-endpoint e rds-secret-arn são publicados no SSM Parameter Store pelo
+      # Terraform de fiap-tc3-infra-db — lemos de lá em vez de remote state
+      # cruzado, já que os dois repos têm pipelines/ciclos de vida independentes.
+      # A senha nunca fica em texto plano no repositório: vem do master user
+      # gerenciado pelo próprio RDS (manage_master_user_password, ver
+      # docs/ADR-004) e só transita neste job para virar o Secret do Kubernetes.
+      - name: Configurar ConfigMap/Secret com dados do RDS (SSM + Secrets Manager)
+        run: |
+          RDS_ENDPOINT=$(aws ssm get-parameter --name "/fiap-tc3/${AMBIENTE}/rds-endpoint" --query 'Parameter.Value' --output text)
+          RDS_SECRET_ARN=$(aws ssm get-parameter --name "/fiap-tc3/${AMBIENTE}/rds-secret-arn" --query 'Parameter.Value' --output text)
+          RDS_SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id "$RDS_SECRET_ARN" --query 'SecretString' --output text)
+          RDS_USERNAME=$(echo "$RDS_SECRET_JSON" | jq -r '.username')
+          RDS_PASSWORD=$(echo "$RDS_SECRET_JSON" | jq -r '.password')
+          echo "::add-mask::$RDS_PASSWORD"
+
+          kubectl patch configmap oficina-config -n oficina --type merge \
+            -p "{\"data\":{\"SPRING_DATASOURCE_URL\":\"jdbc:postgresql://${RDS_ENDPOINT}:5432/oficina\"}}"
+          kubectl patch secret oficina-secret -n oficina --type merge \
+            -p "{\"stringData\":{\"SPRING_DATASOURCE_USERNAME\":\"${RDS_USERNAME}\",\"SPRING_DATASOURCE_PASSWORD\":\"${RDS_PASSWORD}\"}}"
+
       # O EKS puxa a mesma imagem publicada no GHCR pelo job build-and-push — evita
       # duplicar registry (ECR) só para satisfazer o requisito de deploy em nuvem.
+      # Roda depois do patch acima para que os pods recriados já subam com o
+      # SPRING_DATASOURCE_URL/credenciais corretos (env vars só são lidas na
+      # criação do pod, não recarregadas ao vivo).
       - name: Atualizar imagem do deployment
         run: |
           kubectl set image deployment/oficina-app oficina-app=${{ env.IMAGE_NAME }}:${{ github.sha }} -n oficina

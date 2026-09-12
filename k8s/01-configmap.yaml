@@ -5,8 +5,9 @@ metadata:
   namespace: oficina
 data:
   DATABASE_NAME: "oficina"
-  # Preenchido pelo pipeline de deploy com o endpoint do RDS (output do repositório
-  # de infra do banco — fiap-tc3-infra-db). Valor abaixo é só placeholder local.
+  # Sobrescrito pelo job deploy-eks do CI/CD com o endpoint real do RDS (lido do
+  # SSM, publicado pelo Terraform de fiap-tc3-infra-db). Valor abaixo é só
+  # placeholder para apply manual/local.
   SPRING_DATASOURCE_URL: "jdbc:postgresql://CHANGE_ME.rds.amazonaws.com:5432/oficina"
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
   SPRING_MAIL_HOST: "mailhog"
