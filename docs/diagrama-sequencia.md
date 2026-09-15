@@ -6,7 +6,7 @@ sequenceDiagram
     participant GW as API Gateway
     participant L as Lambda auth-cpf
     participant SM as Secrets Manager
-    participant DB as RDS PostgreSQL
+    participant DB as Postgres (StatefulSet no EKS)
     participant ALB as ALB
     participant App as App (EKS)
 

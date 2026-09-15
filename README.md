@@ -12,7 +12,7 @@ A Fase 3 divide o sistema em **4 repositórios**:
 |---|---|---|
 | 1 | [`fiap-tc3-lambda-auth`](https://github.com/MatVicDev/fiap-tc3-lambda-auth) | Function Serverless (AWS Lambda) de autenticação por CPF + API Gateway |
 | 2 | [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) | Terraform do cluster EKS, rede, autoscaling, Load Balancer Controller e Datadog Agent |
-| 3 | [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) | Terraform do RDS PostgreSQL gerenciado |
+| 3 | [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) | Terraform do Postgres (StatefulSet dentro do próprio EKS — ver nota abaixo) |
 | 4 | **`fiap-TC1-oficina` (este repositório)** | Aplicação Spring Boot + manifests Kubernetes |
 
 Documentação de arquitetura completa (diagramas, RFCs, ADRs, modelo ER) em [`/docs`](./docs):
@@ -22,7 +22,7 @@ Documentação de arquitetura completa (diagramas, RFCs, ADRs, modelo ER) em [`/
 - [ADR-001 Padrão de comunicação](./docs/ADR-001-padrao-comunicacao.md) · [ADR-002 Escalabilidade](./docs/ADR-002-escalabilidade-hpa-node-autoscaling.md) · [ADR-003 Gateway só para Lambda](./docs/ADR-003-gateway-somente-para-lambda.md) · [ADR-004 RDS master user compartilhado](./docs/ADR-004-rds-master-user-compartilhado.md) · [ADR-005 FK lógica entre agregados](./docs/ADR-005-fk-logica-entre-agregados.md)
 - [Diagrama ER](./docs/ER-diagrama.md)
 
-> **Status do deploy real:** a conta AWS do desafio está pendente de liberação de crédito pela FIAP. Todo o Terraform, pipelines de CI/CD e código estão prontos e validados (compilação, testes, `terraform validate`); o `terraform apply`/deploy efetivo em nuvem fica para quando a conta existir — ver seção de CI/CD de cada repositório.
+> **Status do deploy real:** implantado e testado de ponta a ponta em uma conta **AWS Academy Learner Lab** (fornecida pela FIAP). Esse ambiente restringe permissões IAM por política de curso e **bloqueia `rds:CreateDBInstance` por completo** (nem RDS clássico, nem a instância dentro de um cluster Aurora) — por isso o Postgres roda como `StatefulSet` dentro do próprio EKS em vez de RDS gerenciado, e EKS/node group/ALB Controller usam a role `LabRole` pré-existente do lab em vez de roles IAM próprias (sem IRSA, sem OIDC provider). Decisão documentada com o motivo técnico em [RFC-001](./docs/RFC-001-escolha-banco-de-dados.md) e no Terraform de cada repositório de infra. O `terraform apply`/deploy dos 4 repositórios foi feito manualmente (`kubectl`/`terraform` locais com as credenciais de sessão do lab) — os pipelines de CI/CD continuam preparados para uma conta AWS "normal" (via `DEPLOY_TO_AWS` + OIDC), que é o caminho que seria usado fora do contexto acadêmico deste desafio.
 
 ---
 
@@ -253,23 +253,25 @@ Este comando irá:
 
 ## ☸️ Deploy em Kubernetes
 
-> Desde a Fase 3, o Postgres **não roda mais dentro do cluster** — o banco é o RDS gerenciado provisionado por [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db). Localmente (`docker-compose`/`kind`), nada muda: continua subindo um Postgres em container para desenvolvimento.
+> Desde a Fase 3, o Postgres de nuvem **não faz parte dos manifestos deste repositório** — é provisionado à parte por [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) (namespace `database`, `StatefulSet` + PVC, com um NLB interno para a Lambda de autenticação alcançar). Localmente (`docker-compose`/`kind`), nada muda: continua subindo um Postgres em container para desenvolvimento.
 
 Os manifestos ficam em `/k8s`, com prefixo numérico para garantir a ordem de aplicação (namespace → config → segredos → mailhog → app → HPA):
 
 ```
 k8s/
 ├── 00-namespace.yaml    # namespace "oficina"
-├── 01-configmap.yaml    # config não sensível (URL do banco — RDS em nuvem, tags do Datadog, etc.)
+├── 01-configmap.yaml    # config não sensível (URL do banco — Postgres em nuvem, tags do Datadog, etc.)
 ├── 02-secret.yaml       # credenciais do banco e chave JWT (valores placeholder — troque antes de usar fora do seu ambiente local)
 ├── 04-mailhog.yaml      # Deployment + Service do MailHog (só para o smoke test local/CI)
 ├── 05-app.yaml          # Deployment + Service da aplicação (annotations do Datadog + DD_AGENT_HOST)
 └── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
 ```
 
-Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) (cria o RDS e publica `rds-endpoint`/`rds-secret-arn` no SSM Parameter Store). O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza o resto: lê esses valores do SSM/Secrets Manager, atualiza o `SPRING_DATASOURCE_URL` do ConfigMap e as credenciais do Secret, e só então atualiza a imagem do Deployment — tudo isso quando a variável `DEPLOY_TO_AWS=true` está configurada.
+Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) (sobe o Postgres dentro do próprio EKS e publica `rds-endpoint`/`rds-secret-arn` no SSM Parameter Store — nomes mantidos por compatibilidade, o valor por trás é o NLB interno do StatefulSet, não mais um RDS). O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza o resto: lê esses valores do SSM/Secrets Manager, atualiza o `SPRING_DATASOURCE_URL` do ConfigMap e as credenciais do Secret, e só então atualiza a imagem do Deployment — tudo isso quando a variável `DEPLOY_TO_AWS=true` está configurada.
 
-Segredos/variáveis necessários no GitHub para habilitar o job `deploy-eks`: secret `AWS_ROLE_ARN` (OIDC, sem chaves estáticas) e variáveis `AWS_REGION`, `EKS_CLUSTER_NAME`. A role assumida via OIDC também precisa de permissão para `ssm:GetParameter` em `/fiap-tc3/*` e `secretsmanager:GetSecretValue` no secret gerenciado do RDS, além do acesso ao cluster EKS (`eks:DescribeCluster` + entrada no `aws-auth`/access entries).
+Segredos/variáveis necessários no GitHub para habilitar o job `deploy-eks`: secret `AWS_ROLE_ARN` (OIDC, sem chaves estáticas) e variáveis `AWS_REGION`, `EKS_CLUSTER_NAME`. A role assumida via OIDC também precisa de permissão para `ssm:GetParameter` em `/fiap-tc3/*` e `secretsmanager:GetSecretValue` no secret com as credenciais do banco, além do acesso ao cluster EKS (`eks:DescribeCluster` + entrada no `aws-auth`/access entries).
+
+> **Nota AWS Academy Learner Lab:** o ambiente usado neste desafio bloqueia a criação de roles/OIDC provider necessários para o job `deploy-eks` (GitHub OIDC) funcionar — por isso o deploy real foi feito rodando `terraform apply`/`kubectl` localmente, com as credenciais de sessão do lab, em vez de via CI/CD. O pipeline continua correto e pronto para uma conta AWS sem essa restrição.
 
 A seguir, o fluxo **local/kind** usado no dia a dia de desenvolvimento e no smoke test do CI (não usa RDS nem EKS):
 

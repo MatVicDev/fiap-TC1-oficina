@@ -18,18 +18,18 @@ flowchart TB
     subgraph AWS["AWS"]
         subgraph Repo2["fiap-tc3-infra-k8s"]
             ALB["ALB\n(AWS Load Balancer Controller)"]
-            subgraph EKS["EKS — namespace oficina"]
-                App["fiap-TC1-oficina\nDeployment (2-5 réplicas via HPA)"]
+            subgraph EKS["EKS"]
+                App["fiap-TC1-oficina\nDeployment (2-5 réplicas via HPA)\nnamespace oficina"]
                 DDAgent["Datadog Agent\n(DaemonSet)"]
+                subgraph Repo3["fiap-tc3-infra-db — namespace database"]
+                    RDS[("Postgres 16\nStatefulSet + PVC (EBS)")]
+                end
+                App -->|ClusterIP| RDS
             end
             ALB --> App
         end
 
-        subgraph Repo3["fiap-tc3-infra-db"]
-            RDS[("RDS PostgreSQL 16")]
-        end
-
-        SM["Secrets Manager\n(JWT secret, credenciais RDS)"]
+        SM["Secrets Manager\n(JWT secret, credenciais do banco)"]
         SSM["SSM Parameter Store\n(outputs cruzados entre repos)"]
     end
 
@@ -50,7 +50,6 @@ flowchart TB
     Repo2 -.publica/lê.-> SSM
     Lambda -->|JWT role=CLIENTE| ClienteFinal
     ClienteFinal -->|"Authorization: Bearer <jwt>"| ALB
-    App --> RDS
     App -->|traces/logs| DDAgent --> Datadog
     GHCR --> App
 
@@ -65,7 +64,7 @@ flowchart TB
 |---|---|---|
 | 1 | [`fiap-tc3-lambda-auth`](https://github.com/MatVicDev/fiap-tc3-lambda-auth) | Function Serverless de autenticação por CPF + API Gateway (Terraform) |
 | 2 | [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) | VPC, EKS, node group com autoscaling, AWS Load Balancer Controller, Datadog Agent (Terraform) |
-| 3 | [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) | RDS PostgreSQL gerenciado (Terraform) |
+| 3 | [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) | Postgres via `StatefulSet` dentro do EKS provisionado por `fiap-tc3-infra-k8s` (Terraform, providers `kubernetes`/`random`) |
 | 4 | [`fiap-TC1-oficina`](https://github.com/MatVicDev/fiap-TC1-oficina) | Aplicação principal (Spring Boot) + manifests Kubernetes + Dockerfile |
 
 Ligação entre repositórios independentes: SSM Parameter Store, não Terraform remote state (ver seção "Rede" do README de `fiap-tc3-infra-db` e `fiap-tc3-lambda-auth`) — cada repositório tem pipeline e ciclo de vida próprios.
