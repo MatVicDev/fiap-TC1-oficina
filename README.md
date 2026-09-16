@@ -260,14 +260,16 @@ Os manifestos ficam em `/k8s`, com prefixo numérico para garantir a ordem de ap
 ```
 k8s/
 ├── 00-namespace.yaml    # namespace "oficina"
-├── 01-configmap.yaml    # config não sensível (URL do banco — Postgres em nuvem, tags do Datadog, etc.)
+├── 01-configmap.yaml    # config não sensível (URL do banco, tags do Datadog, etc.)
 ├── 02-secret.yaml       # credenciais do banco e chave JWT (valores placeholder — troque antes de usar fora do seu ambiente local)
+├── 03-postgres.yaml     # Deployment + PVC + Service do Postgres local (docker-compose/kind e smoke test do CI; não é aplicado em EKS real)
 ├── 04-mailhog.yaml      # Deployment + Service do MailHog (só para o smoke test local/CI)
 ├── 05-app.yaml          # Deployment + Service da aplicação (annotations do Datadog + DD_AGENT_HOST)
-└── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
+├── 06-hpa.yaml          # HorizontalPodAutoscaler da aplicação (2 a 5 réplicas, 70% CPU)
+└── 07-ingress.yaml      # Ingress ALB público (EKS real; AWS Load Balancer Controller de fiap-tc3-infra-k8s)
 ```
 
-Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) (sobe o Postgres dentro do próprio EKS e publica `rds-endpoint`/`rds-secret-arn` no SSM Parameter Store — nomes mantidos por compatibilidade, o valor por trás é o NLB interno do StatefulSet, não mais um RDS). O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza o resto: lê esses valores do SSM/Secrets Manager, atualiza o `SPRING_DATASOURCE_URL` do ConfigMap e as credenciais do Secret, e só então atualiza a imagem do Deployment — tudo isso quando a variável `DEPLOY_TO_AWS=true` está configurada.
+Em **nuvem real (EKS)**: aplique primeiro o Terraform de [`fiap-tc3-infra-k8s`](https://github.com/MatVicDev/fiap-tc3-infra-k8s) (cria o cluster), depois o de [`fiap-tc3-infra-db`](https://github.com/MatVicDev/fiap-tc3-infra-db) (sobe o Postgres dentro do próprio EKS e publica `rds-endpoint`/`rds-secret-arn` no SSM Parameter Store — nomes mantidos por compatibilidade, o valor por trás é o NLB interno do StatefulSet, não mais um RDS). Ao aplicar os manifestos de `/k8s` nesse cluster, **pule o `03-postgres.yaml`** — o Postgres real já vem do `fiap-tc3-infra-db`, e aplicar os dois juntos só sobe um Postgres local ocioso dentro do namespace `oficina`. Nesse caso, aplique os arquivos individualmente (`kubectl apply -f k8s/00-namespace.yaml -f k8s/01-configmap.yaml -f k8s/02-secret.yaml -f k8s/04-mailhog.yaml -f k8s/05-app.yaml -f k8s/06-hpa.yaml -f k8s/07-ingress.yaml`) em vez de `kubectl apply -f k8s`. O pipeline de CI/CD deste repositório (job `deploy-eks`) automatiza o resto: lê esses valores do SSM/Secrets Manager, atualiza o `SPRING_DATASOURCE_URL` do ConfigMap e as credenciais do Secret, e só então atualiza a imagem do Deployment — tudo isso quando a variável `DEPLOY_TO_AWS=true` está configurada.
 
 Segredos/variáveis necessários no GitHub para habilitar o job `deploy-eks`: secret `AWS_ROLE_ARN` (OIDC, sem chaves estáticas) e variáveis `AWS_REGION`, `EKS_CLUSTER_NAME`. A role assumida via OIDC também precisa de permissão para `ssm:GetParameter` em `/fiap-tc3/*` e `secretsmanager:GetSecretValue` no secret com as credenciais do banco, além do acesso ao cluster EKS (`eks:DescribeCluster` + entrada no `aws-auth`/access entries).
 
