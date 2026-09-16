@@ -21,6 +21,26 @@ class ClienteTest {
         assertEquals("Matheus Victor", cliente.getNome());
         assertEquals("12345678909", cliente.getCpfNumero());
         assertNotNull(cliente.getDataCadastro());
+        assertEquals(StatusCliente.ATIVO, cliente.getStatus());
+        assertTrue(cliente.isAtivo());
+    }
+
+    @Test
+    @DisplayName("Deve inativar e reativar cliente")
+    void deveInativarEReativarCliente() {
+        Cliente cliente = new Cliente(
+                "Matheus Victor",
+                "12345678909",
+                "41999999999",
+                "matheus@email.com");
+
+        cliente.inativar();
+        assertEquals(StatusCliente.INATIVO, cliente.getStatus());
+        assertFalse(cliente.isAtivo());
+
+        cliente.ativar();
+        assertEquals(StatusCliente.ATIVO, cliente.getStatus());
+        assertTrue(cliente.isAtivo());
     }
 
     @Test

@@ -20,9 +20,10 @@ public class JWTService {
     @Value("${jwt.expiration}")
     private Long tempoExpiracaoMs;
 
-    public String gerarToken(String username) {
+    public String gerarToken(String subject, String role) {
         return Jwts.builder()
-                .subject(username)
+                .subject(subject)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + tempoExpiracaoMs))
                 .signWith(getSecretKey())
@@ -31,6 +32,10 @@ public class JWTService {
 
     public String extrairUsername(String token) {
         return getClaims(token).getSubject();
+    }
+
+    public String extrairRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
     public boolean isTokenValido(String token) {

@@ -8,7 +8,10 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "itens_ordem_servico")
+@Table(name = "itens_ordem_servico", indexes = {
+        @Index(name = "idx_itens_os_ordem_servico_id", columnList = "ordem_servico_id"),
+        @Index(name = "idx_itens_os_insumo_id", columnList = "insumoId")
+})
 public class ItemOS {
 
     @Id

@@ -11,6 +11,7 @@ public class ClienteMapper {
                 cliente.getCpfNumero(),
                 cliente.getTelefone(),
                 cliente.getEmail(),
+                cliente.getStatus(),
                 cliente.getDataCadastro());
     }
 }

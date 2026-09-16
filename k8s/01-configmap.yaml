@@ -5,8 +5,16 @@ metadata:
   namespace: oficina
 data:
   DATABASE_NAME: "oficina"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/oficina"
+  # Sobrescrito pelo job deploy-eks do CI/CD com o endpoint real do RDS (lido do
+  # SSM, publicado pelo Terraform de fiap-tc3-infra-db). Valor abaixo é só
+  # placeholder para apply manual/local.
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://CHANGE_ME.rds.amazonaws.com:5432/oficina"
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
   SPRING_MAIL_HOST: "mailhog"
   SPRING_MAIL_PORT: "1025"
   JWT_EXPIRATION: "86400000"
+  SPRING_APPLICATION_NAME: "oficina-app"
+  DD_SERVICE: "oficina-app"
+  DD_ENV: "production"
+  DD_VERSION: "1.0.0"
+  DD_TRACE_SAMPLE_RATE: "1"

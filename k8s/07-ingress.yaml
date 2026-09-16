@@ -1,0 +1,25 @@
+# ALB público criado pelo AWS Load Balancer Controller (fiap-tc3-infra-k8s).
+# target-type ip: o ALB manda tráfego direto pro IP do pod, sem depender do
+# NodePort do Service.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oficina-app
+  namespace: oficina
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /v3/api-docs
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080

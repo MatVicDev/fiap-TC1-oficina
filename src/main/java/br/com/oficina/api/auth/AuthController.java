@@ -26,7 +26,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(
                         request.usuario(), request.senha()));
 
-        String token = jwtService.gerarToken(request.usuario());
+        String token = jwtService.gerarToken(request.usuario(), "ADMIN");
         return ResponseEntity.ok(token);
     }
 }
