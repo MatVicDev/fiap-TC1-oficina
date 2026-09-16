@@ -5,10 +5,10 @@ metadata:
   namespace: oficina
 data:
   DATABASE_NAME: "oficina"
-  # Sobrescrito pelo job deploy-eks do CI/CD com o endpoint real do RDS (lido do
-  # SSM, publicado pelo Terraform de fiap-tc3-infra-db). Valor abaixo é só
-  # placeholder para apply manual/local.
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://CHANGE_ME.rds.amazonaws.com:5432/oficina"
+  # Aponta para o Postgres local (k8s/03-postgres.yaml), usado por docker-compose/
+  # kind e pelo smoke test do CI. Em EKS real, é sobrescrito pelo job deploy-eks
+  # com o endpoint do RDS (lido do SSM, publicado pelo Terraform de fiap-tc3-infra-db).
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/oficina"
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
   SPRING_MAIL_HOST: "mailhog"
   SPRING_MAIL_PORT: "1025"
